@@ -1,0 +1,10 @@
+= 
+:allow-uri-read: 
+
+
+.Antes de empezar
+Asegúrese de que la expiración del token de sesión de AWS sea suficiente para cualquier operación de copia de seguridad de S3 de larga duración.  Si el token caduca durante la operación de copia de seguridad, la operación puede fallar.
+
+* Consulte el https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html["Documentación de AWS API"^] Para obtener más información sobre cómo comprobar la caducidad del token de sesión actual.
+* Consulte el https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html["Documentación de AWS IAM"^] Para obtener más información sobre las credenciales con los recursos de AWS.
+

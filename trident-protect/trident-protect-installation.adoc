@@ -1,0 +1,136 @@
+---
+sidebar: sidebar 
+permalink: trident-protect/trident-protect-installation.html 
+keywords: install, trident, protect, requirements, registry 
+summary: Si su entorno cumple los requisitos, puede seguir estos pasos para instalar Trident Protect. 
+---
+= Instalar y configurar Trident Protect
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ../media/
+
+
+[role="lead"]
+Si su entorno cumple los requisitos de Trident Protect, puede seguir estos pasos para instalar Trident Protect en su clúster.  Puedes obtener Trident Protect de NetApp o instalarlo desde tu propio registro privado.  Instalar desde un registro privado resulta útil si su clúster no puede acceder a Internet.
+
+
+
+== Instala Trident Protect
+
+[role="tabbed-block"]
+====
+.Instala Trident Protect de NetApp
+--
+.Pasos
+. Añadir el repositorio Trident Helm:
++
+[source, console]
+----
+helm repo add netapp-trident-protect https://netapp.github.io/trident-protect-helm-chart
+----
+. Utilice Helm para instalar Trident Protect.  Reemplazar `<name-of-cluster>` con un nombre de clúster, que se asignará al clúster y se utilizará para identificar las copias de seguridad y las instantáneas del clúster:
++
+[source, console]
+----
+helm install trident-protect netapp-trident-protect/trident-protect --set clusterName=<name-of-cluster> --version 100.2506.0 --create-namespace --namespace trident-protect
+----
+
+
+--
+.Instalar Trident Protect desde un registro privado
+--
+Puedes instalar Trident Protect desde un registro de imágenes privado si tu clúster de Kubernetes no puede acceder a Internet.  En estos ejemplos, sustituya los valores entre corchetes por información de su entorno:
+
+.Pasos
+. Descarga las siguientes imágenes a tu máquina local, actualiza las etiquetas y luego súbelas a tu registro privado:
++
+[source, console]
+----
+netapp/controller:25.06.0
+netapp/restic:25.06.0
+netapp/kopia:25.06.0
+netapp/trident-autosupport:25.06.0
+netapp/exechook:25.06.0
+netapp/resourcebackup:25.06.0
+netapp/resourcerestore:25.06.0
+netapp/resourcedelete:25.06.0
+bitnami/kubectl:1.30.2
+kubebuilder/kube-rbac-proxy:v0.16.0
+----
++
+Por ejemplo:
+
++
+[source, console]
+----
+docker pull netapp/controller:25.06.0
+----
++
+[source, console]
+----
+docker tag netapp/controller:25.06.0 <private-registry-url>/controller:25.06.0
+----
++
+[source, console]
+----
+docker push <private-registry-url>/controller:25.06.0
+----
+. Cree el espacio de nombres del sistema Trident Protect:
++
+[source, console]
+----
+kubectl create ns trident-protect
+----
+. Iniciar sesión en el registro:
++
+[source, console]
+----
+helm registry login <private-registry-url> -u <account-id> -p <api-token>
+----
+. Crea un secreto de extracción para usar en la autenticación del registro privado:
++
+[source, console]
+----
+kubectl create secret docker-registry regcred --docker-username=<registry-username> --docker-password=<api-token> -n trident-protect --docker-server=<private-registry-url>
+----
+. Añadir el repositorio Trident Helm:
++
+[source, console]
+----
+helm repo add netapp-trident-protect https://netapp.github.io/trident-protect-helm-chart
+----
+. Crea un archivo llamado `protectValues.yaml` .  Asegúrese de que contenga la siguiente configuración de Trident Protect:
++
+[source, yaml]
+----
+---
+image:
+  registry: <private-registry-url>
+imagePullSecrets:
+  - name: regcred
+controller:
+  image:
+    registry: <private-registry-url>
+rbacProxy:
+  image:
+    registry: <private-registry-url>
+crCleanup:
+  imagePullSecrets:
+    - name: regcred
+webhooksCleanup:
+  imagePullSecrets:
+    - name: regcred
+----
+. Utilice Helm para instalar Trident Protect.  Reemplazar `<name_of_cluster>` con un nombre de clúster, que se asignará al clúster y se utilizará para identificar las copias de seguridad y las instantáneas del clúster:
++
+[source, console]
+----
+helm install trident-protect netapp-trident-protect/trident-protect --set clusterName=<name_of_cluster> --version 100.2506.0 --create-namespace --namespace trident-protect -f protectValues.yaml
+----
+
+
+--
+====

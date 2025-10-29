@@ -1,0 +1,419 @@
+---
+sidebar: sidebar 
+permalink: faq.html 
+keywords: faq, frequently asked questions 
+summary: Encuentre respuestas a las preguntas más frecuentes sobre la instalación, configuración, actualización y solución de problemas de Trident. 
+---
+= Preguntas frecuentes
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ./media/
+
+
+[role="lead"]
+Encuentre respuestas a las preguntas más frecuentes sobre la instalación, configuración, actualización y solución de problemas de Trident.
+
+
+
+== Preguntas generales
+
+
+
+=== ¿Con qué frecuencia se lanza Trident ?
+
+A partir del lanzamiento del 24 de febrero, Trident se lanza cada cuatro meses: febrero, junio y octubre.
+
+
+
+=== ¿Es compatible Trident con todas las características que se lanzan en una versión específica de Kubernetes?
+
+Trident normalmente no admite funciones alfa en Kubernetes.  Trident podría admitir funciones beta en las dos versiones de Trident que sigan a la versión beta de Kubernetes.
+
+
+
+=== ¿Depende Trident de algún otro producto de NetApp para su funcionamiento?
+
+Trident no tiene dependencias de otros productos de software de NetApp y funciona como una aplicación independiente.  Sin embargo, deberá disponer de un dispositivo de almacenamiento backend de NetApp .
+
+
+
+=== ¿Cómo puedo obtener los detalles completos de la configuración de Trident ?
+
+Utilice el `tridentctl get` comando para obtener más información sobre su configuración de Trident .
+
+
+
+=== ¿Puedo obtener métricas sobre cómo Trident aprovisiona el almacenamiento?
+
+Sí. Puntos de conexión de Prometheus que se pueden utilizar para recopilar información sobre el funcionamiento de Trident , como el número de backends gestionados, el número de volúmenes aprovisionados, los bytes consumidos, etc.  También puedes usarlink:https://docs.netapp.com/us-en/cloudinsights/["Cloud Insights"^] para el seguimiento y análisis.
+
+
+
+=== ¿Cambia la experiencia del usuario al utilizar Trident como aprovisionador CSI?
+
+No. No hay cambios en lo que respecta a la experiencia del usuario y las funcionalidades.  El nombre del proveedor utilizado es `csi.trident.netapp.io` .  Se recomienda este método de instalación de Trident si desea utilizar todas las nuevas funciones que ofrecen las versiones actuales y futuras.
+
+
+
+== Instala y usa Trident en un clúster de Kubernetes.
+
+
+
+=== ¿Admite Trident la instalación sin conexión desde un registro privado?
+
+Sí, Trident se puede instalar sin conexión a internet. Referirse alink:../trident-get-started/kubernetes-deploy.html["Aprenda sobre la instalación de Trident"^] .
+
+
+
+=== ¿Puedo instalar Trident de forma remota?
+
+Sí. Trident 18.10 y versiones posteriores admiten la capacidad de instalación remota desde cualquier máquina que tenga `kubectl` acceso al clúster.  Después `kubectl` Se verifica el acceso (por ejemplo, al iniciar un `kubectl get nodes` Comando desde la máquina remota para verificar), siga las instrucciones de instalación.
+
+
+
+=== ¿Puedo configurar la alta disponibilidad con Trident?
+
+Trident se instala como un Deployment de Kubernetes (ReplicaSet) con una sola instancia, por lo que cuenta con alta disponibilidad integrada. No se recomienda aumentar el número de réplicas en el deployment.  Si se pierde el nodo donde está instalado Trident o el pod resulta inaccesible por algún otro motivo, Kubernetes vuelve a implementar automáticamente el pod en un nodo en buen estado de su clúster.  Trident solo funciona en el plano de control, por lo que las cápsulas actualmente instaladas no se verán afectadas si se vuelve a desplegar Trident .
+
+
+
+=== ¿Necesita Trident acceso al espacio de nombres kube-system?
+
+Trident lee del servidor de la API de Kubernetes para determinar cuándo las aplicaciones solicitan nuevos PVC, por lo que necesita acceso a kube-system.
+
+
+
+=== ¿Cuáles son los roles y privilegios utilizados por Trident?
+
+El instalador de Trident crea un Kubernetes ClusterRole, que tiene acceso específico a los recursos PersistentVolume, PersistentVolumeClaim, StorageClass y Secret del clúster de Kubernetes. Referirse alink:trident-get-started/kubernetes-customize-deploy-tridentctl.html["Personalizar la instalación de tridentctl"^] .
+
+
+
+=== ¿Puedo generar localmente los archivos de manifiesto exactos que Trident utiliza para la instalación?
+
+Si es necesario, puede generar y modificar localmente los archivos de manifiesto exactos que Trident utiliza para la instalación. Referirse alink:trident-get-started/kubernetes-customize-deploy-tridentctl.html["Personalizar la instalación de tridentctl"^] .
+
+
+
+=== ¿Puedo compartir la misma SVM de backend de ONTAP para dos instancias de Trident separadas en dos clústeres de Kubernetes separados?
+
+Aunque no es recomendable, puede utilizar el mismo SVM de backend para dos instancias de Trident .  Especifique un nombre de volumen único para cada instancia durante la instalación o especifique un único `StoragePrefix` parámetro en el `setup/backend.json` archivo.  Esto es para garantizar que no se utilice el mismo FlexVol volume para ambas instancias.
+
+
+
+=== ¿Es posible instalar Trident en ContainerLinux (anteriormente CoreOS)?
+
+Trident es simplemente un pod de Kubernetes y se puede instalar dondequiera que se esté ejecutando Kubernetes.
+
+
+
+=== ¿Puedo usar Trident con NetApp Cloud Volumes ONTAP?
+
+Sí, Trident es compatible con AWS, Google Cloud y Azure.
+
+
+
+=== ¿Es compatible Trident con Cloud Volumes Services?
+
+Sí, Trident es compatible con el servicio Azure NetApp Files en Azure, así como con el Cloud Volumes Service en GCP.
+
+
+
+== Solución de problemas y soporte
+
+
+
+=== ¿ NetApp ofrece soporte Trident?
+
+Aunque Trident es de código abierto y se proporciona de forma gratuita, NetApp lo admite completamente siempre que su backend de NetApp sea compatible.
+
+
+
+=== ¿Cómo puedo presentar una solicitud de asistencia?
+
+Para abrir un caso de soporte, realice una de las siguientes acciones:
+
+. Contacta con tu gestor de cuenta de soporte y obtén ayuda para abrir una incidencia.
+. Abra un caso de soporte poniéndose en contacto con https://www.netapp.com/company/contact-us/support/["Soporte de NetApp"^] .
+
+
+
+
+=== ¿Cómo genero un paquete de registros de soporte?
+
+Puedes crear un paquete de soporte ejecutando `tridentctl logs -a` .  Además de los registros capturados en el paquete, capture el registro de kubelet para diagnosticar los problemas de montaje en el lado de Kubernetes.  Las instrucciones para obtener el registro de kubelet varían según cómo esté instalado Kubernetes.
+
+
+
+=== ¿Qué debo hacer si necesito solicitar una nueva funcionalidad?
+
+Crea un problema en https://github.com/NetApp/trident["Trident Github"^] y mencione *RFE* en el asunto y la descripción del problema.
+
+
+
+=== ¿Dónde puedo reportar un defecto?
+
+Crea un problema en https://github.com/NetApp/trident["Trident Github"^] .  Asegúrese de incluir toda la información y los registros necesarios relacionados con el problema.
+
+
+
+=== ¿Qué ocurre si tengo una pregunta rápida sobre Trident que necesito aclarar?  ¿Existe alguna comunidad o foro?
+
+Si tiene alguna pregunta, problema o solicitud, póngase en contacto con nosotros a través de nuestro Trident.link:https://discord.gg/NetApp["Canal de Discord"^] o GitHub.
+
+
+
+=== La contraseña de mi sistema de almacenamiento ha cambiado y Trident ya no funciona, ¿cómo puedo recuperarlo?
+
+Actualiza la contraseña del backend con `tridentctl update backend myBackend -f </path/to_new_backend.json> -n trident` .  Reemplazar `myBackend` en el ejemplo con el nombre de su backend, y ``/path/to_new_backend.json` con el camino correcto `backend.json` archivo.
+
+
+
+=== Trident no puede encontrar mi nodo de Kubernetes.  ¿Cómo puedo solucionar esto?
+
+Existen dos posibles escenarios por los que Trident no puede encontrar un nodo de Kubernetes.  Puede deberse a un problema de red dentro de Kubernetes o a un problema de DNS.  El daemonset del nodo Trident que se ejecuta en cada nodo de Kubernetes debe poder comunicarse con el controlador Trident para registrar el nodo con Trident.  Si se produjeron cambios en la red después de instalar Trident , este problema solo se presentará con los nuevos nodos de Kubernetes que se agreguen al clúster.
+
+
+
+=== Si la cápsula Trident se destruye, ¿perderé los datos?
+
+Los datos no se perderán si la cápsula Trident es destruida.  Los metadatos de Trident se almacenan en objetos CRD.  Todos los PV que hayan sido aprovisionados por Trident funcionarán con normalidad.
+
+
+
+== Mejora el Trident
+
+
+
+=== ¿Puedo actualizar directamente de una versión anterior a una versión más reciente (saltándome algunas versiones)?
+
+NetApp admite la actualización de Trident de una versión principal a la siguiente versión principal inmediata.  Puedes actualizar de la versión 18.xx a la 19.xx, de la 19.xx a la 20.xx, y así sucesivamente.  Deberías probar la actualización en un entorno de laboratorio antes de su implementación en producción.
+
+
+
+=== ¿Es posible degradar Trident a una versión anterior?
+
+Si necesita solucionar errores detectados tras una actualización, problemas de dependencias o una actualización fallida o incompleta, deberíalink:trident-managing-k8s/uninstall-trident.html["Desinstalar Trident"] y reinstale la versión anterior siguiendo las instrucciones específicas para esa versión.  Esta es la única forma recomendada de volver a una versión anterior.
+
+
+
+== Gestionar backends y volúmenes
+
+
+
+=== ¿Necesito definir tanto ManagementLIF como DataLIF en un archivo de definición de backend de ONTAP ?
+
+La gestión del LIF es obligatoria.  DataLIF varía:
+
+* ONTAP SAN: No especificar para iSCSI.  Trident utilizalink:https://docs.netapp.com/us-en/ontap/san-admin/selective-lun-map-concept.html["Mapa selectivo de LUN de ONTAP"^] para descubrir los LIF de iSCI necesarios para establecer una sesión de múltiples rutas.  Se genera una advertencia si `dataLIF` está definido explícitamente. Referirse a link:trident-use/ontap-san-examples.html["Opciones y ejemplos de configuración de SAN de ONTAP"] Para más detalles.
+* NAS ONTAP : NetApp recomienda especificar `dataLIF` .  Si no se proporcionan, Trident obtiene los dataLIF del SVM.  Puede especificar un nombre de dominio completo (FQDN) para usarlo en las operaciones de montaje NFS, lo que le permite crear un DNS round-robin para equilibrar la carga entre varios dataLIF.  Referirse alink:trident-use/ontap-nas-examples.html["Opciones y ejemplos de configuración de ONTAP NAS"] para más detalles
+
+
+
+
+=== ¿Puede Trident configurar CHAP para backends ONTAP ?
+
+Sí. Trident admite CHAP bidireccional para backends ONTAP .  Esto requiere configurar `useCHAP=true` en la configuración de tu backend.
+
+
+
+=== ¿Cómo gestiono las políticas de exportación con Trident?
+
+Trident puede crear y gestionar políticas de exportación de forma dinámica a partir de la versión 20.04.  Esto permite al administrador de almacenamiento proporcionar uno o más bloques CIDR en su configuración de backend y hacer que Trident agregue las direcciones IP de los nodos que se encuentren dentro de estos rangos a una política de exportación que cree.  De esta forma, Trident gestiona automáticamente la adición y eliminación de reglas para nodos con direcciones IP dentro de los CIDR dados.
+
+
+
+=== ¿Se pueden utilizar direcciones IPv6 para las LIF de gestión y datos?
+
+Trident permite definir direcciones IPv6 para:
+
+* `managementLIF`y `dataLIF` para backends NAS de ONTAP .
+* `managementLIF`para backends SAN de ONTAP .  No puedes especificar `dataLIF` en un backend SAN ONTAP .
+
+
+Trident debe instalarse usando el flag `--use-ipv6` (para `tridentctl` instalación), `IPv6` (para el operador Trident ), o `tridentTPv6` (para la instalación de Helm) para que funcione sobre IPv6.
+
+
+
+=== ¿Es posible actualizar el LIF de gestión en el backend?
+
+Sí, es posible actualizar el LIF de gestión del backend utilizando el `tridentctl update backend` dominio.
+
+
+
+=== ¿Es posible actualizar DataLIF en el backend?
+
+Puedes actualizar DataLIF en `ontap-nas` y `ontap-nas-economy` solo.
+
+
+
+=== ¿Puedo crear múltiples backends en Trident para Kubernetes?
+
+Trident puede admitir muchos backends simultáneamente, ya sea con el mismo controlador o con controladores diferentes.
+
+
+
+=== ¿Cómo almacena Trident las credenciales del backend?
+
+Trident almacena las credenciales del backend como secretos de Kubernetes.
+
+
+
+=== ¿Cómo selecciona Trident un backend específico?
+
+Si los atributos del backend no se pueden usar para seleccionar automáticamente los pools adecuados para una clase, el `storagePools` y `additionalStoragePools` Los parámetros se utilizan para seleccionar un conjunto específico de pools.
+
+
+
+=== ¿Cómo puedo asegurarme de que Trident no realice el aprovisionamiento desde un backend específico?
+
+El `excludeStoragePools` Este parámetro se utiliza para filtrar el conjunto de pools que Trident utiliza para el aprovisionamiento y eliminará cualquier pool que coincida.
+
+
+
+=== Si existen varios backends del mismo tipo, ¿cómo selecciona Trident cuál backend utilizar?
+
+Si existen varios backends configurados del mismo tipo, Trident selecciona el backend apropiado en función de los parámetros presentes en `StorageClass` y `PersistentVolumeClaim` .  Por ejemplo, si existen varios backends de controladores ontap-nas, Trident intenta hacer coincidir los parámetros en el `StorageClass` y `PersistentVolumeClaim` combinados y compatibles con un backend que pueda cumplir con los requisitos enumerados en `StorageClass` y `PersistentVolumeClaim` .  Si existen varios servidores backend que coinciden con la solicitud, Trident selecciona uno de ellos al azar.
+
+
+
+=== ¿Admite Trident CHAP bidireccional con Element/ SolidFire?
+
+Sí.
+
+
+
+=== ¿Cómo implementa Trident Qtrees en un volumen ONTAP ?  ¿Cuántos Qtrees se pueden implementar en un solo volumen?
+
+El `ontap-nas-economy` El controlador crea hasta 200 Qtrees en el mismo FlexVol volume (configurable entre 50 y 300), 100.000 Qtrees por nodo de clúster y 2,4 millones por clúster.  Cuando entras en un nuevo `PersistentVolumeClaim` Ese servicio lo proporciona el controlador de economía; el controlador comprueba si ya existe un FlexVol volume que pueda dar servicio al nuevo Qtree.  Si no existe un FlexVol volume que pueda dar servicio al Qtree, se crea un nuevo FlexVol volume .
+
+
+
+=== ¿Cómo puedo configurar los permisos Unix para los volúmenes aprovisionados en ONTAP NAS?
+
+Puede configurar los permisos Unix en el volumen aprovisionado por Trident estableciendo un parámetro en el archivo de definición del backend.
+
+
+
+=== ¿Cómo puedo configurar un conjunto explícito de opciones de montaje NFS de ONTAP al aprovisionar un volumen?
+
+Por defecto, Trident no establece ninguna opción de montaje con Kubernetes.  Para especificar las opciones de montaje en la clase de almacenamiento de Kubernetes, siga el ejemplo proporcionado.link:https://github.com/NetApp/trident/blob/master/trident-installer/sample-input/storage-class-samples/storage-class-ontapnas-k8s1.8-mountoptions.yaml["aquí"^] .
+
+
+
+=== ¿Cómo configuro los volúmenes aprovisionados con una política de exportación específica?
+
+Para permitir que los hosts apropiados accedan a un volumen, utilice el `exportPolicy` parámetro configurado en el archivo de definición del backend.
+
+
+
+=== ¿Cómo configuro el cifrado de volumen a través de Trident con ONTAP?
+
+Puede configurar el cifrado en el volumen aprovisionado por Trident utilizando el parámetro de cifrado en el archivo de definición del backend.  Para obtener más información, consulte:link:trident-reco/security-reco.html#use-trident-with-nve-and-nae["Cómo funciona Trident con NVE y NAE"]
+
+
+
+=== ¿Cuál es la mejor manera de implementar QoS para ONTAP a través de Trident?
+
+Usar `StorageClasses` Implementar QoS para ONTAP.
+
+
+
+=== ¿Cómo puedo especificar el aprovisionamiento ligero o grueso a través de Trident?
+
+Los controladores ONTAP admiten aprovisionamiento ligero o grueso.  Los controladores ONTAP utilizan por defecto el aprovisionamiento ligero.  Si se desea un aprovisionamiento grueso, debe configurar el archivo de definición del backend o el `StorageClass` .  Si ambos están configurados, `StorageClass` tiene prioridad.  Configure lo siguiente para ONTAP:
+
+. En `StorageClass` , establecer el `provisioningType` atributo como grueso.
+. En el archivo de definición del backend, habilite los volúmenes gruesos configurando `backend spaceReserve parameter` como volumen.
+
+
+
+
+=== ¿Cómo puedo asegurarme de que los volúmenes en uso no se eliminen incluso si borro accidentalmente el PVC?
+
+La protección PVC se habilita automáticamente en Kubernetes a partir de la versión 1.10.
+
+
+
+=== ¿Puedo cultivar PVC NFS creados con Trident?
+
+Sí. Puedes expandir un tubo de PVC que haya sido creado por Trident.  Tenga en cuenta que el crecimiento automático de volumen es una característica de ONTAP que no es aplicable a Trident.
+
+
+
+=== ¿Puedo importar un volumen mientras está en modo de protección de datos (DP) de SnapMirror o en modo sin conexión?
+
+La importación de volumen falla si el volumen externo está en modo DP o está fuera de línea.  Recibes el siguiente mensaje de error:
+
+[listing]
+----
+Error: could not import volume: volume import failed to get size of volume: volume <name> was not found (400 Bad Request) command terminated with exit code 1.
+Make sure to remove the DP mode or put the volume online before importing the volume.
+----
+
+
+=== ¿Cómo se traduce la cuota de recursos a un clúster NetApp ?
+
+La cuota de recursos de almacenamiento de Kubernetes debería funcionar siempre que el almacenamiento de NetApp tenga capacidad.  Cuando el almacenamiento de NetApp no ​​puede respetar la configuración de cuota de Kubernetes debido a la falta de capacidad, Trident intenta realizar el aprovisionamiento, pero se produce un error.
+
+
+
+=== ¿Puedo crear instantáneas de volumen usando Trident?
+
+Sí. Trident admite la creación de instantáneas de volumen bajo demanda y volúmenes persistentes a partir de instantáneas.  Para crear volúmenes persistentes a partir de instantáneas, asegúrese de que `VolumeSnapshotDataSource` La puerta de funciones se ha habilitado.
+
+
+
+=== ¿Qué controladores admiten instantáneas de volumen de Trident ?
+
+A partir de hoy, el soporte de instantáneas bajo demanda está disponible para nuestros `ontap-nas` , `ontap-nas-flexgroup` , `ontap-san` , `ontap-san-economy` , `solidfire-san` , `gcp-cvs` , y `azure-netapp-files` Controladores de backend.
+
+
+
+=== ¿Cómo puedo realizar una copia de seguridad instantánea de un volumen aprovisionado por Trident con ONTAP?
+
+Esto está disponible en `ontap-nas` , `ontap-san` , y `ontap-nas-flexgroup` conductores.  También puedes especificar un `snapshotPolicy` Para el `ontap-san-economy` Controlador a nivel FlexVol .
+
+Esto también está disponible en el `ontap-nas-economy` controladores, pero con una granularidad a nivel de FlexVol volume y no a nivel de qtree.  Para habilitar la capacidad de crear instantáneas de volúmenes aprovisionados por Trident, configure la opción de parámetro de backend. `snapshotPolicy` a la política de instantáneas deseada tal como se define en el backend de ONTAP .  Trident desconoce cualquier instantánea tomada por el controlador de almacenamiento.
+
+
+
+=== ¿Puedo establecer un porcentaje de reserva de instantáneas para un volumen aprovisionado a través de Trident?
+
+Sí, puedes reservar un porcentaje específico de espacio en disco para almacenar las copias de instantáneas a través de Trident configurando la opción `snapshotReserve` atributo en el archivo de definición del backend.  Si lo has configurado `snapshotPolicy` y `snapshotReserve` En el archivo de definición del backend, el porcentaje de reserva de instantáneas se establece de acuerdo con `snapshotReserve` porcentaje mencionado en el archivo backend.  Si el `snapshotReserve` No se menciona el porcentaje; ONTAP, por defecto, toma el porcentaje de reserva de instantáneas como 5.  Si el `snapshotPolicy` Si la opción está configurada en ninguna, el porcentaje de reserva de instantáneas se establece en 0.
+
+
+
+=== ¿Puedo acceder directamente al directorio de instantáneas de volumen y copiar archivos?
+
+Sí, puedes acceder al directorio de instantáneas en el volumen aprovisionado por Trident configurando `snapshotDir` parámetro en el archivo de definición del backend.
+
+
+
+=== ¿Puedo configurar SnapMirror para volúmenes a través de Trident?
+
+Actualmente, SnapMirror debe configurarse externamente utilizando ONTAP CLI o OnCommand System Manager.
+
+
+
+=== ¿Cómo puedo restaurar volúmenes persistentes a una instantánea ONTAP específica?
+
+Para restaurar un volumen a una instantánea de ONTAP , siga los siguientes pasos:
+
+. Quitar el pod de la aplicación que está utilizando el volumen persistente.
+. Restaure la instantánea requerida a través de ONTAP CLI o OnCommand System Manager.
+. Reinicie el pod de la aplicación.
+
+
+
+
+=== ¿Puede Trident aprovisionar volúmenes en SVM que tienen configurado un espejo de reparto de carga?
+
+Se pueden crear réplicas de reparto de carga para los volúmenes raíz de las SVM que sirven datos a través de NFS.  ONTAP actualiza automáticamente los espejos de reparto de carga para los volúmenes que han sido creados por Trident.  Esto puede ocasionar retrasos en el aumento de los volúmenes.  Cuando se crean varios volúmenes utilizando Trident, el aprovisionamiento de un volumen depende de que ONTAP actualice el espejo de reparto de carga.
+
+
+
+=== ¿Cómo puedo separar el uso de la clase de almacenamiento para cada cliente/inquilino?
+
+Kubernetes no permite clases de almacenamiento en espacios de nombres.  Sin embargo, puede usar Kubernetes para limitar el uso de una clase de almacenamiento específica por espacio de nombres mediante el uso de cuotas de recursos de almacenamiento, que son por espacio de nombres.  Para denegar el acceso de un espacio de nombres específico a un almacenamiento específico, establezca la cuota de recursos en 0 para esa clase de almacenamiento.

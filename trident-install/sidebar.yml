@@ -1,0 +1,30 @@
+---
+section: trident-install
+title: Instalar Trident
+entries:
+- title: Descripción general de la instalación
+  url: "/trident-get-started/kubernetes-deploy.html"
+- title: Instalar usando el operador Trident
+  entries:
+  - title: Despliegue manualmente el operador Trident (Estándar)
+    url: "/trident-get-started/kubernetes-deploy-operator.html"
+  - title: Despliegue manual del operador Trident (sin conexión)
+    url: "/trident-get-started/kubernetes-deploy-operator-mirror.html"
+  - title: Utilice la carta de navegación del timón Trident (estándar).
+    url: "/trident-get-started/kubernetes-deploy-helm.html"
+  - title: Usar la carta de navegación del timón Trident (sin conexión)
+    url: "/trident-get-started/kubernetes-deploy-helm-mirror.html"
+  - title: Personalizar la instalación del operador Trident
+    url: "/trident-get-started/kubernetes-customize-deploy.html"
+- title: Instalar usando tridentctl
+  entries:
+  - title: Instalar usando tridentctl
+    url: "/trident-get-started/kubernetes-deploy-tridentctl.html"
+  - title: Personalizar la instalación de tridentctl
+    url: "/trident-get-started/kubernetes-customize-deploy-tridentctl.html"
+- title: Instalar utilizando un operador certificado de OpenShift
+  entries:
+  - title: Instalar Trident usando OpenShift OperatorHub
+    url: "/trident-get-started/openshift-operator-deploy.html"
+  - title: Cambie de operador de la comunidad Trident a operador certificado de OpenShift
+    url: "/trident-get-started/openshift-certified-operator-deploy.html"

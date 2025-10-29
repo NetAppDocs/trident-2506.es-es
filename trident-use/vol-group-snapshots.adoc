@@ -1,0 +1,175 @@
+---
+sidebar: sidebar 
+permalink: trident-use/vol-group-snapshots.html 
+keywords: volumes, on-demand volume group snapshots, csi, csi snapshots, create snapshots, backends, kubernetes, create PVCs, PVCs, snapshot, volume snapshot, import snapshot, recover data 
+summary: 'Las instantáneas de volúmenes persistentes (PV) de Kubernetes permiten realizar copias puntuales de los volúmenes.  Puede crear una instantánea de un volumen creado con Trident, importar una instantánea creada fuera de Trident, crear un nuevo volumen a partir de una instantánea existente y recuperar datos de volumen a partir de instantáneas.' 
+---
+= Trabajar con instantáneas de grupos de volúmenes
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+[role="lead"]
+Instantáneas de grupos de volúmenes de Kubernetes de volúmenes persistentes (PV) NetApp Trident ofrece la capacidad de crear instantáneas de múltiples volúmenes (un grupo de instantáneas de volumen).  Esta instantánea del grupo de volúmenes representa copias de múltiples volúmenes tomadas en el mismo momento.
+
+
+NOTE: VolumeGroupSnapshot es una función beta en Kubernetes con API beta.  Kubernetes 1.32 es la versión mínima requerida para VolumeGroupSnapshot.
+
+
+
+== Crear instantáneas de grupos de volúmenes
+
+La instantánea de grupo de volúmenes es compatible con `ontap-san` Controlador, solo para el protocolo iSCSI, aún no compatible con Fibre Channel (FCP) ni NVMe/TCP.  Antes de comenzar
+
+* Asegúrese de que su versión de Kubernetes sea K8s 1.32 o superior.
+* Para trabajar con instantáneas, debe disponer de un controlador de instantáneas externo y definiciones de recursos personalizados (CRD).  Esta es responsabilidad del orquestador de Kubernetes (por ejemplo: Kubeadm, GKE, OpenShift).
++
+Si su distribución de Kubernetes no incluye el controlador de instantáneas externo ni los CRD, consulte<<Implementar un controlador de instantáneas de volumen>> .
+
++
+
+NOTE: No cree un controlador de instantáneas si va a crear instantáneas de grupos de volúmenes bajo demanda en un entorno GKE.  GKE utiliza un controlador de instantáneas integrado y oculto.
+
+* En el archivo YAML del controlador de instantáneas, configure el `CSIVolumeGroupSnapshot` Establezca el valor de la función en 'true' para garantizar que la instantánea del grupo de volúmenes esté habilitada.
+* Cree las clases de instantáneas de grupo de volúmenes necesarias antes de crear una instantánea de grupo de volúmenes.
+* Asegúrese de que todos los PVC/volúmenes estén en el mismo SVM para poder crear VolumeGroupSnapshot.
+
+
+.Pasos
+* Cree una clase VolumeGroupSnapshotClass antes de crear un objeto VolumeGroupSnapshot.  Para obtener más información, consultelink:../trident-reference/objects.html#kubernetes-volumegroupsnapshotclass-objects["Clase de instantánea de grupo de volumen"] .
++
+[source, yaml]
+----
+apiVersion: groupsnapshot.storage.k8s.io/v1beta1
+kind: VolumeGroupSnapshotClass
+metadata:
+  name: csi-group-snap-class
+  annotations:
+    kubernetes.io/description: "Trident group snapshot class"
+driver: csi.trident.netapp.io
+deletionPolicy: Delete
+----
+* Cree PVC con las etiquetas necesarias utilizando las clases de almacenamiento existentes, o agregue estas etiquetas a los PVC existentes.
++
+El siguiente ejemplo crea el PVC utilizando `pvc1-group-snap` como fuente de datos y etiqueta `consistentGroupSnapshot: groupA` .  Define la clave y el valor de la etiqueta según tus requisitos.
+
+
+
+[listing]
+----
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvc1-group-snap
+  labels:
+    consistentGroupSnapshot: groupA
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+  storageClassName: sc1-1
+----
+* Crea un VolumeGroupSnapshot con la misma etiqueta(`consistentGroupSnapshot: groupA` ) especificado en el PVC.
++
+Este ejemplo crea una instantánea de grupo de volúmenes:
+
+
+
+[listing]
+----
+apiVersion: groupsnapshot.storage.k8s.io/v1beta1
+kind: VolumeGroupSnapshot
+metadata:
+  name: "vgs1"
+  namespace: trident
+spec:
+  volumeGroupSnapshotClassName: csi-group-snap-class
+  source:
+    selector:
+      matchLabels:
+        consistentGroupSnapshot: groupA
+----
+
+
+== Recuperar datos de volumen mediante una instantánea de grupo
+
+Puede restaurar volúmenes persistentes individuales utilizando las instantáneas individuales que se han creado como parte de la instantánea del grupo de volúmenes.  No se puede recuperar la instantánea del grupo de volúmenes como una unidad.
+
+Utilice la CLI de ONTAP para restaurar instantáneas de volumen para restaurar un volumen a un estado registrado en una instantánea anterior.
+
+[listing]
+----
+cluster1::*> volume snapshot restore -vserver vs0 -volume vol3 -snapshot vol3_snap_archive
+----
+
+NOTE: Al restaurar una copia de instantánea, se sobrescribe la configuración de volumen existente.  Los cambios realizados en los datos del volumen después de la creación de la copia de instantánea se pierden.
+
+
+
+== Restauración de volumen in situ a partir de una instantánea
+
+Trident proporciona una restauración de volumen rápida e in situ a partir de una instantánea utilizando la `TridentActionSnapshotRestore` (TASR) CR.  Esta solicitud de cambio (CR) funciona como una acción imperativa de Kubernetes y no persiste una vez finalizada la operación.
+
+Para obtener más información, consulte link:../trident-use/vol-snapshots.html#in-place-volume-restoration-from-a-snapshot["Restauración de volumen in situ a partir de una instantánea"].
+
+
+
+== Eliminar un PV con instantáneas de grupo asociadas
+
+Al eliminar una instantánea de volumen de grupo:
+
+* Puede eliminar VolumeGroupSnapshots en su totalidad, no instantáneas individuales dentro del grupo.
+* Si se eliminan volúmenes persistentes mientras existe una instantánea para ese volumen persistente, Trident moverá ese volumen a un estado de "eliminación" porque la instantánea debe eliminarse antes de que el volumen pueda eliminarse de forma segura.
+* Si se ha creado un clon utilizando una instantánea agrupada y luego se va a eliminar el grupo, se iniciará una operación de división en clon y el grupo no se podrá eliminar hasta que se complete la división.
+
+
+
+
+== Implementar un controlador de instantáneas de volumen
+
+Si tu distribución de Kubernetes no incluye el controlador de instantáneas y los CRD, puedes implementarlos de la siguiente manera.
+
+.Pasos
+. Crear CRD de instantáneas de volumen.
++
+[listing]
+----
+cat snapshot-setup.sh
+----
++
+[source, sh]
+----
+#!/bin/bash
+# Create volume snapshot CRDs
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/client/config/crd/groupsnapshot.storage.k8s.io_volumegroupsnapshotclasses.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/client/config/crd/groupsnapshot.storage.k8s.io_volumegroupsnapshotcontents.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/client/config/crd/groupsnapshot.storage.k8s.io_volumegroupsnapshots.yaml
+----
+. Crea el controlador de instantáneas.
++
+[source, console]
+----
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/deploy/kubernetes/snapshot-controller/rbac-snapshot-controller.yaml
+----
++
+[source, console]
+----
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/deploy/kubernetes/snapshot-controller/setup-snapshot-controller.yaml
+----
++
+
+NOTE: Si es necesario, abra `deploy/kubernetes/snapshot-controller/rbac-snapshot-controller.yaml` y actualizar `namespace` a tu espacio de nombres.
+
+
+
+
+
+== Enlaces relacionados
+
+* link:../trident-reference/objects.html#kubernetes-volumegroupsnapshotclass-objects["Clase de instantánea de grupo de volumen"]
+* link:../trident-concepts/snapshots.html["Instantáneas de volumen"]
+

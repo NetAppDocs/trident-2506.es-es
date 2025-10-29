@@ -1,0 +1,395 @@
+---
+sidebar: sidebar 
+permalink: trident-protect/trident-protect-protect-apps.html 
+keywords: protect, snapshots, demand, configuration, cluster, appvault 
+summary: Proteja todas las aplicaciones tomando instantáneas y copias de seguridad utilizando una política de protección automatizada o de forma puntual. 
+---
+= Proteja sus aplicaciones con Trident Protect.
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ../media/
+
+
+[role="lead"]
+Puedes proteger todas las aplicaciones gestionadas por Trident Protect tomando instantáneas y copias de seguridad utilizando una política de protección automatizada o de forma puntual.
+
+
+NOTE: Puede configurar Trident Protect para congelar y descongelar sistemas de archivos durante las operaciones de protección de datos. link:trident-protect-requirements.html#protecting-data-with-kubevirt-vms["Obtenga más información sobre cómo configurar la congelación del sistema de archivos con Trident Protect."].
+
+
+
+== Crea una instantánea bajo demanda
+
+Puedes crear una instantánea bajo demanda en cualquier momento.
+
+
+NOTE: Los recursos con ámbito de clúster se incluyen en una copia de seguridad, instantánea o clon si se hace referencia a ellos explícitamente en la definición de la aplicación o si tienen referencias a cualquiera de los espacios de nombres de la aplicación.
+
+[role="tabbed-block"]
+====
+.Cree una instantánea utilizando un CR
+--
+.Pasos
+. Crea el archivo de recursos personalizados (CR) y nómbralo. `trident-protect-snapshot-cr.yaml` .
+. En el archivo que creó, configure los siguientes atributos:
++
+** *metadata.name*: (_Obligatorio_) El nombre de este recurso personalizado; elija un nombre único y adecuado para su entorno.
+** *spec.applicationRef*: El nombre de Kubernetes de la aplicación a la que se va a crear una instantánea.
+** *spec.appVaultRef*: (_Obligatorio_) El nombre del AppVault donde se deben almacenar los contenidos de la instantánea (metadatos).
+** *spec.reclaimPolicy*: (_Opcional_) Define qué sucede con el AppArchive de una instantánea cuando se elimina el CR de la instantánea.  Esto significa que incluso cuando se configura para `Retain` La instantánea será eliminada.  Opciones válidas:
++
+*** `Retain`(por defecto)
+*** `Delete`
++
+[source, yaml]
+----
+---
+apiVersion: protect.trident.netapp.io/v1
+kind: Snapshot
+metadata:
+  namespace: my-app-namespace
+  name: my-cr-name
+spec:
+  applicationRef: my-application
+  appVaultRef: appvault-name
+  reclaimPolicy: Delete
+----
+
+
+
+
+. Después de rellenar el `trident-protect-snapshot-cr.yaml` Archivo con los valores correctos, aplicar el CR:
++
+[source, console]
+----
+kubectl apply -f trident-protect-snapshot-cr.yaml
+----
+
+
+--
+.Crea una instantánea usando la CLI.
+--
+.Pasos
+. Crea la instantánea, reemplazando los valores entre corchetes con información de tu entorno. Por ejemplo:
++
+[source, console]
+----
+tridentctl-protect create snapshot <my_snapshot_name> --appvault <my_appvault_name> --app <name_of_app_to_snapshot> -n <application_namespace>
+----
+
+
+--
+====
+
+
+== Crea una copia de seguridad bajo demanda
+
+Puedes realizar una copia de seguridad de una aplicación en cualquier momento.
+
+
+NOTE: Los recursos con ámbito de clúster se incluyen en una copia de seguridad, instantánea o clon si se hace referencia a ellos explícitamente en la definición de la aplicación o si tienen referencias a cualquiera de los espacios de nombres de la aplicación.
+
+.Antes de empezar
+Asegúrese de que la expiración del token de sesión de AWS sea suficiente para cualquier operación de copia de seguridad de S3 de larga duración.  Si el token caduca durante la operación de copia de seguridad, la operación puede fallar.
+
+* Consulte el https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html["Documentación de AWS API"^] Para obtener más información sobre cómo comprobar la caducidad del token de sesión actual.
+* Consulte el https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html["Documentación de AWS IAM"^] Para obtener más información sobre las credenciales con los recursos de AWS.
+
+
+[role="tabbed-block"]
+====
+.Cree una copia de seguridad utilizando un CR.
+--
+.Pasos
+. Crea el archivo de recursos personalizados (CR) y nómbralo. `trident-protect-backup-cr.yaml` .
+. En el archivo que creó, configure los siguientes atributos:
++
+** *metadata.name*: (_Obligatorio_) El nombre de este recurso personalizado; elija un nombre único y adecuado para su entorno.
+** *spec.applicationRef*: (_Obligatorio_) El nombre de Kubernetes de la aplicación de la que se hará la copia de seguridad.
+** *spec.appVaultRef*: (_Obligatorio_) El nombre del AppVault donde se debe almacenar el contenido de la copia de seguridad.
+** *spec.dataMover*: (_Opcional_) Una cadena que indica qué herramienta de copia de seguridad se utilizará para la operación de copia de seguridad.  Valores posibles (distingue entre mayúsculas y minúsculas):
++
+*** `Restic`
+*** `Kopia`(por defecto)
+
+
+** *spec.reclaimPolicy*: (_Opcional_) Define qué sucede con una copia de seguridad cuando se libera de su reclamación.  Valores posibles:
++
+*** `Delete`
+*** `Retain`(por defecto)
+
+
+** *spec.snapshotRef*: (_Opcional_): Nombre de la instantánea que se utilizará como origen de la copia de seguridad.  Si no se proporciona, se creará y copiará una instantánea temporal.
+** *metadata.annotations.protect.trident.netapp.io/full-backup* : (_Opcional_) Esta anotación se utiliza para especificar si una copia de seguridad no debe ser incremental. De forma predeterminada, todas las copias de seguridad son incrementales.  Sin embargo, si esta anotación está configurada para `true` , la copia de seguridad deja de ser incremental.  Si no se especifica, la copia de seguridad sigue la configuración de copia de seguridad incremental predeterminada.  La mejor práctica es realizar una copia de seguridad completa periódicamente y luego realizar copias de seguridad incrementales entre las copias de seguridad completas para minimizar el riesgo asociado con las restauraciones.
++
+Ejemplo de YAML:
+
++
+[source, yaml]
+----
+---
+apiVersion: protect.trident.netapp.io/v1
+kind: Backup
+metadata:
+  namespace: my-app-namespace
+  name: my-cr-name
+  annotations:
+    protect.trident.netapp.io/full-backup: "true"
+spec:
+  applicationRef: my-application
+  appVaultRef: appvault-name
+  dataMover: Kopia
+----
+
+
+. Después de rellenar el `trident-protect-backup-cr.yaml` Archivo con los valores correctos, aplicar el CR:
++
+[source, console]
+----
+kubectl apply -f trident-protect-backup-cr.yaml
+----
+
+
+--
+.Crea una copia de seguridad usando la CLI.
+--
+.Pasos
+. Crea la copia de seguridad, reemplazando los valores entre corchetes con información de tu entorno. Por ejemplo:
++
+[source, console]
+----
+tridentctl-protect create backup <my_backup_name> --appvault <my-vault-name> --app <name_of_app_to_back_up> --data-mover <Kopia_or_Restic> -n <application_namespace>
+----
++
+Opcionalmente, puede utilizar el `--full-backup` Bandera para especificar si una copia de seguridad debe ser no incremental. De forma predeterminada, todas las copias de seguridad son incrementales.  Cuando se utiliza esta bandera, la copia de seguridad deja de ser incremental.  La mejor práctica es realizar una copia de seguridad completa periódicamente y luego realizar copias de seguridad incrementales entre las copias de seguridad completas para minimizar el riesgo asociado con las restauraciones.
+
+
+
+--
+====
+
+
+== Crea un calendario de protección de datos.
+
+Una política de protección protege una aplicación mediante la creación de instantáneas, copias de seguridad o ambas según un cronograma definido. Puede elegir crear instantáneas y copias de seguridad cada hora, día, semana o mes, y puede especificar la cantidad de copias que desea conservar. Puede programar una copia de seguridad completa no incremental mediante la anotación full-backup-rule. De forma predeterminada, todas las copias de seguridad son incrementales. Realizar una copia de seguridad completa periódicamente, junto con copias de seguridad incrementales entre ellas, ayuda a reducir el riesgo asociado con las restauraciones.
+
+[NOTE]
+====
+* Solo puedes crear programaciones para instantáneas configurando `backupRetention` a cero y `snapshotRetention` a un valor mayor que cero.  Configuración `snapshotRetention` A cero significa que cualquier copia de seguridad programada seguirá creando instantáneas, pero estas son temporales y se eliminan inmediatamente después de que se complete la copia de seguridad.
+* Los recursos con ámbito de clúster se incluyen en una copia de seguridad, instantánea o clon si se hace referencia a ellos explícitamente en la definición de la aplicación o si tienen referencias a cualquiera de los espacios de nombres de la aplicación.
+
+
+====
+[role="tabbed-block"]
+====
+.Crea un cronograma usando un CR
+--
+.Pasos
+. Crea el archivo de recursos personalizados (CR) y nómbralo. `trident-protect-schedule-cr.yaml` .
+. En el archivo que creó, configure los siguientes atributos:
++
+** *metadata.name*: (_Obligatorio_) El nombre de este recurso personalizado; elija un nombre único y adecuado para su entorno.
+** *spec.dataMover*: (_Opcional_) Una cadena que indica qué herramienta de copia de seguridad se utilizará para la operación de copia de seguridad.  Valores posibles (distingue entre mayúsculas y minúsculas):
++
+*** `Restic`
+*** `Kopia`(por defecto)
+
+
+** *spec.applicationRef*: El nombre de Kubernetes de la aplicación de la que se realizará la copia de seguridad.
+** *spec.appVaultRef*: (_Obligatorio_) El nombre del AppVault donde se debe almacenar el contenido de la copia de seguridad.
+** *spec.backupRetention*: La cantidad de copias de seguridad que se conservarán. Cero indica que no se deben crear copias de seguridad (solo instantáneas).
+** *spec.snapshotRetention*: El número de instantáneas que se conservarán.  El valor cero indica que no se deben crear instantáneas.
+** *spec.granularity*: La frecuencia con la que debe ejecutarse la programación.  Valores posibles, junto con los campos asociados obligatorios:
++
+*** `Hourly`(requiere que especifique `spec.minute` )
+*** `Daily`(requiere que especifique `spec.minute` y `spec.hour` )
+*** `Weekly`(requiere que especifique `spec.minute, spec.hour` , y `spec.dayOfWeek` )
+*** `Monthly`(requiere que especifique `spec.minute, spec.hour` , y `spec.dayOfMonth` )
+*** `Custom`
+
+
+** *spec.dayOfMonth*: (_Opcional_) El día del mes (1 - 31) en que debe ejecutarse la programación. Este campo es obligatorio si la granularidad está configurada en `Monthly` . El valor debe proporcionarse como una cadena.
+** *spec.dayOfWeek*: (_Opcional_) El día de la semana (0 - 7) en que debe ejecutarse la programación. Los valores de 0 o 7 indican domingo. Este campo es obligatorio si la granularidad está configurada en `Weekly` . El valor debe proporcionarse como una cadena.
+** *spec.hour*: (_Opcional_) La hora del día (0 - 23) en que debe ejecutarse el programa. Este campo es obligatorio si la granularidad está configurada en `Daily` , `Weekly` , o `Monthly` . El valor debe proporcionarse como una cadena.
+** *spec.minute*: (_Opcional_) El minuto de la hora (0 - 59) en que debe ejecutarse el programa. Este campo es obligatorio si la granularidad está configurada en `Hourly` , `Daily` , `Weekly` , o `Monthly` . El valor debe proporcionarse como una cadena.
+** *metadata.annotations.protect.trident.netapp.io/full-backup-rule*: (_Opcional_) Esta anotación se utiliza para especificar la regla para programar la copia de seguridad completa.  Puedes configurarlo para `always` para copias de seguridad completas constantes o personalícelo según sus necesidades.  Por ejemplo, si elige una granularidad diaria, puede especificar los días de la semana en los que se debe realizar la copia de seguridad completa.
++
+Ejemplo de YAML para programación de copias de seguridad y instantáneas:
+
++
+[source, yaml]
+----
+---
+apiVersion: protect.trident.netapp.io/v1
+kind: Schedule
+metadata:
+  namespace: my-app-namespace
+  name: my-cr-name
+  annotations:
+    protect.trident.netapp.io/full-backup-rule: "Monday,Thursday"
+spec:
+  dataMover: Kopia
+  applicationRef: my-application
+  appVaultRef: appvault-name
+  backupRetention: "15"
+  snapshotRetention: "15"
+  granularity: Daily
+  hour: "0"
+  minute: "0"
+----
++
+Ejemplo de YAML para una programación de solo instantáneas:
+
++
+[source, yaml]
+----
+---
+apiVersion: protect.trident.netapp.io/v1
+kind: Schedule
+metadata:
+  namespace: my-app-namespace
+  name: my-snapshot-schedule
+spec:
+  applicationRef: my-application
+  appVaultRef: appvault-name
+  backupRetention: "0"
+  snapshotRetention: "15"
+  granularity: Daily
+  hour: "2"
+  minute: "0"
+----
+
+
+. Después de rellenar el `trident-protect-schedule-cr.yaml` Archivo con los valores correctos, aplicar el CR:
++
+[source, console]
+----
+kubectl apply -f trident-protect-schedule-cr.yaml
+----
+
+
+--
+.Crea una programación usando la CLI.
+--
+.Pasos
+. Cree el plan de protección, reemplazando los valores entre paréntesis con información de su entorno. Por ejemplo:
++
+
+NOTE: Puedes utilizar `tridentctl-protect create schedule --help` Para ver información de ayuda detallada sobre este comando.
+
++
+[source, console]
+----
+tridentctl-protect create schedule <my_schedule_name> --appvault <my_appvault_name> --app <name_of_app_to_snapshot> --backup-retention <how_many_backups_to_retain> --data-mover <Kopia_or_Restic> --day-of-month <day_of_month_to_run_schedule> --day-of-week <day_of_month_to_run_schedule> --granularity <frequency_to_run> --hour <hour_of_day_to_run> --minute <minute_of_hour_to_run> --recurrence-rule <recurrence> --snapshot-retention <how_many_snapshots_to_retain> -n <application_namespace> --full-backup-rule <string>
+----
++
+Puedes configurarlo `--full-backup-rule` bandera a `always` para copias de seguridad completas constantes o personalícelo según sus necesidades.  Por ejemplo, si elige una granularidad diaria, puede especificar los días de la semana en los que debe realizarse la copia de seguridad completa.  Por ejemplo, utilice `--full-backup-rule "Monday,Thursday"` Programar copias de seguridad completas los lunes y jueves.
+
++
+Para programaciones solo con instantáneas, configure `--backup-retention 0` y especifique un valor mayor que 0 para `--snapshot-retention` .
+
+
+
+--
+====
+
+
+== Eliminar una instantánea
+
+Elimine las instantáneas programadas o bajo demanda que ya no necesite.
+
+.Pasos
+. Eliminar el CR de instantánea asociado con la instantánea:
++
+[source, console]
+----
+kubectl delete snapshot <snapshot_name> -n my-app-namespace
+----
+
+
+
+
+== Eliminar una copia de seguridad
+
+Elimine las copias de seguridad programadas o bajo demanda que ya no necesite.
+
+
+NOTE: Asegúrese de que la política de reclamaciones esté configurada para `Delete` Eliminar todos los datos de copia de seguridad del almacenamiento de objetos.  La configuración predeterminada de la política es `Retain` para evitar la pérdida accidental de datos.  Si la política no se modifica a `Delete` Los datos de copia de seguridad permanecerán en el almacenamiento de objetos y requerirán eliminación manual.
+
+.Pasos
+. Eliminar el CR de copia de seguridad asociado con la copia de seguridad:
++
+[source, console]
+----
+kubectl delete backup <backup_name> -n my-app-namespace
+----
+
+
+
+
+== Comprobar el estado de una operación de copia de seguridad
+
+Puede utilizar la línea de comandos para comprobar el estado de una operación de copia de seguridad que esté en curso, haya finalizado o haya fallado.
+
+.Pasos
+. Utilice el siguiente comando para recuperar el estado de la operación de copia de seguridad, reemplazando los valores entre corchetes con información de su entorno:
++
+[source, console]
+----
+kubectl get backup -n <namespace_name> <my_backup_cr_name> -o jsonpath='{.status}'
+----
+
+
+
+
+== Habilitar la copia de seguridad y la restauración para las operaciones de archivos de Azure NetApp (ANF).
+
+Si ha instalado Trident Protect, puede habilitar la funcionalidad de copia de seguridad y restauración con uso eficiente del espacio para los backends de almacenamiento que utilizan la clase de almacenamiento azure-netapp-files y que se crearon antes de Trident 24.06.  Esta funcionalidad funciona con volúmenes NFSv4 y no consume espacio adicional del grupo de capacidad.
+
+.Antes de empezar
+Asegúrese de lo siguiente:
+
+* Has instalado Trident Protect.
+* Has definido una aplicación en Trident Protect.  Esta aplicación tendrá una funcionalidad de protección limitada hasta que complete este procedimiento.
+* Tienes `azure-netapp-files` seleccionada como la clase de almacenamiento predeterminada para su backend de almacenamiento.
+
+
+.Expandir para ver los pasos de configuración
+[%collapsible]
+====
+. Realice lo siguiente en Trident si el volumen ANF se creó antes de actualizar a Trident 24.10:
++
+.. Habilite el directorio de instantáneas para cada PV que esté basado en azure-netapp-files y asociado con la aplicación:
++
+[source, console]
+----
+tridentctl update volume <pv name> --snapshot-dir=true -n trident
+----
+.. Confirme que el directorio de instantáneas se ha habilitado para cada PV asociado:
++
+[source, console]
+----
+tridentctl get volume <pv name> -n trident -o yaml | grep snapshotDir
+----
++
+Respuesta:
+
++
+[listing]
+----
+snapshotDirectory: "true"
+----
++
+Cuando el directorio de instantáneas no está habilitado, Trident Protect elige la funcionalidad de copia de seguridad regular, que consume temporalmente espacio en el grupo de capacidad durante el proceso de copia de seguridad.  En este caso, asegúrese de que haya suficiente espacio disponible en el grupo de capacidad para crear un volumen temporal del tamaño del volumen del que se está realizando la copia de seguridad.
+
+
+
+
+
+.Resultado
+La aplicación está lista para realizar copias de seguridad y restauración utilizando Trident Protect.  Cada PVC también está disponible para ser utilizado por otras aplicaciones para copias de seguridad y restauraciones.
+
+====

@@ -1,0 +1,27 @@
+---
+sidebar: sidebar 
+permalink: trident-concepts/provisioning.html 
+keywords: provisioning, Trident 
+summary: El aprovisionamiento en Trident tiene dos fases principales.  La primera fase asocia una clase de almacenamiento con el conjunto de pools de almacenamiento backend adecuados y se produce como una preparación necesaria antes del aprovisionamiento.  La segunda fase incluye la creación del volumen propiamente dicha y requiere elegir un grupo de almacenamiento de entre los asociados a la clase de almacenamiento del volumen pendiente. 
+---
+= Aprovisionamiento
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+[role="lead"]
+El aprovisionamiento en Trident tiene dos fases principales.  La primera fase asocia una clase de almacenamiento con el conjunto de pools de almacenamiento backend adecuados y se produce como una preparación necesaria antes del aprovisionamiento.  La segunda fase incluye la creación del volumen propiamente dicha y requiere elegir un grupo de almacenamiento de entre los asociados a la clase de almacenamiento del volumen pendiente.
+
+
+
+== Asociación de clase de almacenamiento
+
+La asociación de grupos de almacenamiento de backend con una clase de almacenamiento depende tanto de los atributos solicitados de la clase de almacenamiento como de su `storagePools` , `additionalStoragePools` , y `excludeStoragePools` liza.  Cuando se crea una clase de almacenamiento, Trident compara los atributos y los grupos que ofrece cada uno de sus backends con los que solicita la clase de almacenamiento.  Si los atributos y el nombre de un grupo de almacenamiento coinciden con todos los atributos y nombres de grupo solicitados, Trident agrega ese grupo de almacenamiento al conjunto de grupos de almacenamiento adecuados para esa clase de almacenamiento.  Además, Trident agrega todos los grupos de almacenamiento enumerados en el `additionalStoragePools` incluir en esa lista, incluso si sus atributos no cumplen con todos o alguno de los atributos solicitados por la clase de almacenamiento.  Debes usar el `excludeStoragePools` lista para anular y eliminar grupos de almacenamiento de uso para una clase de almacenamiento.  Trident realiza un proceso similar cada vez que se agrega un nuevo backend, comprobando si sus grupos de almacenamiento satisfacen los de las clases de almacenamiento existentes y eliminando cualquiera que haya sido marcado como excluido.
+
+
+
+== Creación de volumen
+
+A continuación, Trident utiliza las asociaciones entre clases de almacenamiento y grupos de almacenamiento para determinar dónde aprovisionar volúmenes.  Cuando se crea un volumen, Trident primero obtiene el conjunto de grupos de almacenamiento para la clase de almacenamiento de ese volumen y, si se especifica un protocolo para el volumen, Trident elimina aquellos grupos de almacenamiento que no pueden proporcionar el protocolo solicitado (por ejemplo, un backend NetApp HCI/ SolidFire no puede proporcionar un volumen basado en archivos, mientras que un backend ONTAP NAS no puede proporcionar un volumen basado en bloques).  Trident aleatoriza el orden de este conjunto resultante para facilitar una distribución uniforme de los volúmenes y, a continuación, itera a través de él, intentando aprovisionar el volumen en cada grupo de almacenamiento por turno.  Si tiene éxito en una de las pruebas, devuelve un resultado exitoso, registrando cualquier fallo encontrado en el proceso.  Trident devuelve un error *solo* si no puede aprovisionar en *todos* los grupos de almacenamiento disponibles para la clase de almacenamiento y el protocolo solicitados.

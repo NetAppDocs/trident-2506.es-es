@@ -1,0 +1,77 @@
+---
+sidebar: sidebar 
+permalink: trident-docker/collect-logs-docker.html 
+keywords: deploy, Trident, trident for docker, docker, logs, binary, managed plugin 
+summary: Puedes recopilar registros para obtener ayuda en la resolución de problemas.  El método que utilice para recopilar los registros varía según cómo esté ejecutando el complemento de Docker. 
+---
+= Recopilar registros
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+[role="lead"]
+Puedes recopilar registros para obtener ayuda en la resolución de problemas.  El método que utilice para recopilar los registros varía según cómo esté ejecutando el complemento de Docker.
+
+
+
+== Recopilar registros para la resolución de problemas
+
+.Pasos
+. Si está ejecutando Trident utilizando el método de plugin gestionado recomendado (es decir, utilizando `docker plugin` comandos), consúltelos de la siguiente manera:
++
+[source, console]
+----
+docker plugin ls
+----
++
+[listing]
+----
+ID                  NAME                DESCRIPTION                          ENABLED
+4fb97d2b956b        netapp:latest       nDVP - NetApp Docker Volume Plugin   false
+journalctl -u docker | grep 4fb97d2b956b
+----
++
+El nivel de registro estándar debería permitirle diagnosticar la mayoría de los problemas.  Si considera que eso no es suficiente, puede habilitar el registro de depuración.
+
+. Para habilitar el registro de depuración, instale el complemento con el registro de depuración habilitado:
++
+[source, console]
+----
+docker plugin install netapp/trident-plugin:<version> --alias <alias> debug=true
+----
++
+O bien, habilite el registro de depuración cuando el complemento ya esté instalado:
+
++
+[source, console]
+----
+docker plugin disable <plugin>
+----
++
+[source, console]
+----
+docker plugin set <plugin> debug=true
+----
++
+[source, console]
+----
+docker plugin enable <plugin>
+----
+. Si ejecutas el propio binario en el host, los registros estarán disponibles en el archivo de registro del host. `/var/log/netappdvp` directorio.  Para habilitar el registro de depuración, especifique `-debug` cuando ejecutas el plugin.
+
+
+
+
+== Consejos generales para la solución de problemas
+
+* El problema más común con el que se encuentran los nuevos usuarios es una configuración incorrecta que impide que el plugin se inicialice.  Cuando esto ocurra, probablemente verá un mensaje como este al intentar instalar o habilitar el complemento:
++
+`Error response from daemon: dial unix /run/docker/plugins/<id>/netapp.sock: connect: no such file or directory`
+
++
+Esto significa que el plugin no se pudo iniciar.  Por suerte, el plugin se ha desarrollado con una completa capacidad de registro que debería ayudarle a diagnosticar la mayoría de los problemas con los que pueda encontrarse.
+
+* Si hay problemas al montar un panel fotovoltaico en un contenedor, asegúrese de que `rpcbind` Está instalado y en funcionamiento.  Utilice el gestor de paquetes requerido para el sistema operativo anfitrión y compruebe si `rpcbind` está en funcionamiento.  Puedes comprobar el estado del servicio rpcbind ejecutando un `systemctl status rpcbind` o su equivalente.
+

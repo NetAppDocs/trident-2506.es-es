@@ -1,0 +1,316 @@
+---
+permalink: trident-protect/manage-authorization-access-control.html 
+sidebar: sidebar 
+keywords: manage, authentication, rbac 
+summary: 'Trident Protect utiliza el modelo Kubernetes de control de acceso basado en roles (RBAC). Puede utilizar las funciones RBAC de Trident Protect para controlar de forma más precisa el acceso a los recursos.' 
+---
+= Gestionar la autorización y el control de acceso de Trident Protect
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+[role="lead"]
+Trident Protect utiliza el modelo Kubernetes de control de acceso basado en roles (RBAC). Por defecto, Trident Protect proporciona un único espacio de nombres del sistema y su cuenta de servicio predeterminada asociada. Si tiene una organización con muchos usuarios o necesidades de seguridad específicas, puede utilizar las funciones RBAC de Trident Protect para obtener un control más granular sobre el acceso a los recursos y espacios de nombres.
+
+El administrador del clúster siempre tiene acceso a los recursos en la configuración predeterminada. `trident-protect` espacio de nombres, y también puede acceder a recursos en todos los demás espacios de nombres.  Para controlar el acceso a los recursos y las aplicaciones, debe crear espacios de nombres adicionales y agregar los recursos y las aplicaciones a esos espacios de nombres.
+
+Tenga en cuenta que ningún usuario puede crear solicitudes de cambio (CR) de administración de datos de aplicaciones en la configuración predeterminada. `trident-protect` espacio de nombres.  Debe crear los CR de administración de datos de la aplicación en un espacio de nombres de la aplicación (como práctica recomendada, cree los CR de administración de datos de la aplicación en el mismo espacio de nombres que su aplicación asociada).
+
+[NOTE]
+====
+Solo los administradores deben tener acceso a los objetos de recursos personalizados de Trident Protect con privilegios, que incluyen:
+
+* *AppVault*: Requiere datos de credenciales del bucket
+* *AutoSupportBundle*: Recopila métricas, registros y otros datos confidenciales de Trident Protect.
+* *AutoSupportBundleSchedule*: Gestiona los horarios de recopilación de registros.
+
+
+Como práctica recomendada, utilice RBAC para restringir el acceso a objetos privilegiados a los administradores.
+
+====
+Para obtener más información sobre cómo RBAC regula el acceso a los recursos y espacios de nombres, consulte la documentación. https://kubernetes.io/docs/reference/access-authn-authz/rbac/["Documentación de RBAC de Kubernetes"^] .
+
+Para obtener información sobre las cuentas de servicio, consulte la https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/["Documentación de la cuenta de servicio de Kubernetes"^] .
+
+
+
+== Ejemplo: Gestionar el acceso para dos grupos de usuarios
+
+Por ejemplo, una organización tiene un administrador de clúster, un grupo de usuarios de ingeniería y un grupo de usuarios de marketing.  El administrador del clúster completaría las siguientes tareas para crear un entorno donde el grupo de ingeniería y el grupo de marketing tengan acceso únicamente a los recursos asignados a sus respectivos espacios de nombres.
+
+
+
+=== Paso 1: Cree un espacio de nombres para contener los recursos de cada grupo.
+
+La creación de un espacio de nombres le permite separar lógicamente los recursos y controlar mejor quién tiene acceso a ellos.
+
+.Pasos
+. Crea un espacio de nombres para el grupo de ingeniería:
++
+[source, console]
+----
+kubectl create ns engineering-ns
+----
+. Crea un espacio de nombres para el grupo de marketing:
++
+[source, console]
+----
+kubectl create ns marketing-ns
+----
+
+
+
+
+=== Paso 2: Cree nuevas cuentas de servicio para interactuar con los recursos en cada espacio de nombres.
+
+Cada nuevo espacio de nombres que cree viene con una cuenta de servicio predeterminada, pero debería crear una cuenta de servicio para cada grupo de usuarios para que pueda dividir aún más los privilegios entre grupos en el futuro si fuera necesario.
+
+.Pasos
+. Cree una cuenta de servicio para el grupo de ingeniería:
++
+[source, yaml]
+----
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: eng-user
+  namespace: engineering-ns
+----
+. Crea una cuenta de servicio para el grupo de marketing:
++
+[source, yaml]
+----
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mkt-user
+  namespace: marketing-ns
+----
+
+
+
+
+=== Paso 3: Cree un secreto para cada nueva cuenta de servicio
+
+Se utiliza una clave secreta de cuenta de servicio para autenticarse con la cuenta de servicio, y se puede eliminar y volver a crear fácilmente si se ve comprometida.
+
+.Pasos
+. Cree un secreto para la cuenta del servicio de ingeniería:
++
+[source, yaml]
+----
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    kubernetes.io/service-account.name: eng-user
+  name: eng-user-secret
+  namespace: engineering-ns
+type: kubernetes.io/service-account-token
+----
+. Crea una clave secreta para la cuenta del servicio de marketing:
++
+[source, yaml]
+----
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    kubernetes.io/service-account.name: mkt-user
+  name: mkt-user-secret
+  namespace: marketing-ns
+type: kubernetes.io/service-account-token
+----
+
+
+
+
+=== Paso 4: Cree un objeto RoleBinding para vincular el objeto ClusterRole a cada nueva cuenta de servicio.
+
+Al instalar Trident Protect, se crea un objeto ClusterRole predeterminado.  Puede vincular este ClusterRole a la cuenta de servicio creando y aplicando un objeto RoleBinding.
+
+.Pasos
+. Vincule el ClusterRole a la cuenta de servicio de ingeniería:
++
+[source, yaml]
+----
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: engineering-ns-tenant-rolebinding
+  namespace: engineering-ns
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: trident-protect-tenant-cluster-role
+subjects:
+- kind: ServiceAccount
+  name: eng-user
+  namespace: engineering-ns
+----
+. Vincula el ClusterRole a la cuenta del servicio de marketing:
++
+[source, yaml]
+----
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: marketing-ns-tenant-rolebinding
+  namespace: marketing-ns
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: trident-protect-tenant-cluster-role
+subjects:
+- kind: ServiceAccount
+  name: mkt-user
+  namespace: marketing-ns
+----
+
+
+
+
+=== Paso 5: Probar permisos
+
+Comprueba que los permisos sean correctos.
+
+.Pasos
+. Confirme que los usuarios de ingeniería pueden acceder a los recursos de ingeniería:
++
+[source, console]
+----
+kubectl auth can-i --as=system:serviceaccount:engineering-ns:eng-user get applications.protect.trident.netapp.io -n engineering-ns
+----
+. Confirma que los usuarios de ingeniería no pueden acceder a los recursos de marketing:
++
+[source, console]
+----
+kubectl auth can-i --as=system:serviceaccount:engineering-ns:eng-user get applications.protect.trident.netapp.io -n marketing-ns
+----
+
+
+
+
+=== Paso 6: Conceder acceso a los objetos de AppVault
+
+Para realizar tareas de administración de datos como copias de seguridad e instantáneas, el administrador del clúster debe otorgar acceso a los objetos de AppVault a usuarios individuales.
+
+.Pasos
+. Cree y aplique un archivo YAML de combinación de AppVault y secreto que otorgue a un usuario acceso a un AppVault.  Por ejemplo, la siguiente solicitud CR otorga acceso a un AppVault al usuario `eng-user` :
++
+[source, yaml]
+----
+apiVersion: v1
+data:
+  accessKeyID: <ID_value>
+  secretAccessKey: <key_value>
+kind: Secret
+metadata:
+  name: appvault-for-eng-user-only-secret
+  namespace: trident-protect
+type: Opaque
+---
+apiVersion: protect.trident.netapp.io/v1
+kind: AppVault
+metadata:
+  name: appvault-for-eng-user-only
+  namespace: trident-protect # Trident protect system namespace
+spec:
+  providerConfig:
+    azure:
+      accountName: ""
+      bucketName: ""
+      endpoint: ""
+    gcp:
+      bucketName: ""
+      projectID: ""
+    s3:
+      bucketName: testbucket
+      endpoint: 192.168.0.1:30000
+      secure: "false"
+      skipCertValidation: "true"
+  providerCredentials:
+    accessKeyID:
+      valueFromSecret:
+        key: accessKeyID
+        name: appvault-for-eng-user-only-secret
+    secretAccessKey:
+      valueFromSecret:
+        key: secretAccessKey
+        name: appvault-for-eng-user-only-secret
+  providerType: GenericS3
+----
+. Cree y aplique una solicitud de cambio de rol para permitir que los administradores del clúster otorguen acceso a recursos específicos en un espacio de nombres. Por ejemplo:
++
+[source, yaml]
+----
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: eng-user-appvault-reader
+  namespace: trident-protect
+rules:
+- apiGroups:
+  - protect.trident.netapp.io
+  resourceNames:
+  - appvault-for-enguser-only
+  resources:
+  - appvaults
+  verbs:
+  - get
+----
+. Cree y aplique un CR RoleBinding para vincular los permisos al usuario eng-user. Por ejemplo:
++
+[source, yaml]
+----
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: eng-user-read-appvault-binding
+  namespace: trident-protect
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: eng-user-appvault-reader
+subjects:
+- kind: ServiceAccount
+  name: eng-user
+  namespace: engineering-ns
+----
+. Verifique que los permisos sean correctos.
++
+.. Intento de recuperar la información de objetos de AppVault para todos los espacios de nombres:
++
+[source, console]
+----
+kubectl get appvaults -n trident-protect --as=system:serviceaccount:engineering-ns:eng-user
+----
++
+Debería ver un resultado similar al siguiente:
+
++
+[listing]
+----
+Error from server (Forbidden): appvaults.protect.trident.netapp.io is forbidden: User "system:serviceaccount:engineering-ns:eng-user" cannot list resource "appvaults" in API group "protect.trident.netapp.io" in the namespace "trident-protect"
+----
+.. Prueba para comprobar si el usuario puede obtener la información de AppVault a la que ahora tiene permiso de acceso:
++
+[source, console]
+----
+kubectl auth can-i --as=system:serviceaccount:engineering-ns:eng-user get appvaults.protect.trident.netapp.io/appvault-for-eng-user-only -n trident-protect
+----
++
+Debería ver un resultado similar al siguiente:
+
++
+[listing]
+----
+yes
+----
+
+
+
+
+.Resultado
+Los usuarios a los que les haya concedido permisos de AppVault deberían poder utilizar los objetos autorizados de AppVault para las operaciones de gestión de datos de la aplicación, y no deberían poder acceder a ningún recurso fuera de los espacios de nombres asignados ni crear nuevos recursos a los que no tengan acceso.

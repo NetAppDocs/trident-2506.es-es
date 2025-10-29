@@ -1,0 +1,196 @@
+---
+sidebar: sidebar 
+permalink: trident-protect/trident-protect-migrate-apps.html 
+keywords: trident, protect, migrate, storage, restore, backup 
+summary: Puede restaurar sus datos de copia de seguridad o instantánea en un clúster o clase de almacenamiento diferente. 
+---
+= Migrar aplicaciones usando Trident Protect
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ../media/
+
+
+[role="lead"]
+Puede migrar sus aplicaciones entre clústeres o a diferentes clases de almacenamiento restaurando datos de respaldo.
+
+
+NOTE: Al migrar una aplicación, todos los ganchos de ejecución configurados para la aplicación se migran con la aplicación.  Si existe un gancho de ejecución posterior a la restauración, se ejecuta automáticamente como parte de la operación de restauración.
+
+
+
+== Operaciones de copia de seguridad y restauración
+
+Para realizar operaciones de copia de seguridad y restauración en los siguientes escenarios, puede automatizar tareas específicas de copia de seguridad y restauración.
+
+
+
+=== Clonar al mismo clúster
+
+Para clonar una aplicación en el mismo clúster, cree una instantánea o copia de seguridad y restaure los datos en el mismo clúster.
+
+.Pasos
+. Debe realizar una de las siguientes acciones:
++
+.. link:trident-protect-protect-apps.html#create-an-on-demand-snapshot["Crear una instantánea"].
+.. link:trident-protect-protect-apps.html#create-an-on-demand-backup["Crea una copia de seguridad"].
+
+
+. En el mismo clúster, realice una de las siguientes acciones, dependiendo de si creó una instantánea o una copia de seguridad:
++
+.. link:trident-protect-restore-apps.html#restore-from-a-snapshot-to-a-different-namespace["Restaura tus datos desde la instantánea."].
+.. link:trident-protect-restore-apps.html#restore-from-a-backup-to-a-different-namespace["Restaura tus datos desde la copia de seguridad."].
+
+
+
+
+
+
+=== Clonar a un clúster diferente
+
+Para clonar una aplicación en un clúster diferente (realizar una clonación entre clústeres), cree una copia de seguridad en el clúster de origen y, a continuación, restaure la copia de seguridad en un clúster diferente. Asegúrese de que Trident Protect esté instalado en el clúster de destino.
+
+
+NOTE: Puedes replicar una aplicación entre diferentes clústeres usandolink:trident-protect-use-snapmirror-replication.html["Replicación de SnapMirror"] .
+
+.Pasos
+. link:trident-protect-protect-apps.html#create-an-on-demand-backup["Crea una copia de seguridad"].
+. Asegúrese de que el CR de AppVault para el bucket de almacenamiento de objetos que contiene la copia de seguridad se haya configurado en el clúster de destino.
+. En el clúster de destino,link:trident-protect-restore-apps.html#restore-from-a-backup-to-a-different-namespace["Restaura tus datos desde la copia de seguridad"] .
+
+
+
+
+== Migrar aplicaciones de una clase de almacenamiento a otra clase de almacenamiento
+
+Puede migrar aplicaciones de una clase de almacenamiento a una clase de almacenamiento diferente restaurando una copia de seguridad en la clase de almacenamiento de destino.
+
+Por ejemplo (excluyendo los secretos de la restauración CR):
+
+[source, yaml]
+----
+apiVersion: protect.trident.netapp.io/v1
+kind: SnapshotRestore
+metadata:
+  name: "${snapshotRestoreCRName}"
+spec:
+  appArchivePath: "${snapshotArchivePath}"
+  appVaultRef: "${appVaultCRName}"
+  namespaceMapping:
+    - destination: "${destinationNamespace}"
+      source: "${sourceNamespace}"
+  storageClassMapping:
+    - destination: "${destinationStorageClass}"
+      source: "${sourceStorageClass}"
+  resourceFilter:
+    resourceMatchers:
+      kind: Secret
+      version: v1
+    resourceSelectionCriteria: exclude
+----
+[role="tabbed-block"]
+====
+.Restaure la instantánea mediante un CR
+--
+.Pasos
+. Crea el archivo de recursos personalizados (CR) y nómbralo. `trident-protect-snapshot-restore-cr.yaml` .
+. En el archivo que creó, configure los siguientes atributos:
++
+** *metadata.name*: (_Obligatorio_) El nombre de este recurso personalizado; elija un nombre único y adecuado para su entorno.
+** *spec.appArchivePath*: La ruta dentro de AppVault donde se almacenan los contenidos de las instantáneas.  Puedes utilizar el siguiente comando para encontrar esta ruta:
++
+[source, console]
+----
+kubectl get snapshots <my-snapshot-name> -n trident-protect -o jsonpath='{.status.appArchivePath}'
+----
+** *spec.appVaultRef*: (_Obligatorio_) El nombre del AppVault donde se almacenan los contenidos de la instantánea.
+** *spec.namespaceMapping*: La asignación del espacio de nombres de origen de la operación de restauración al espacio de nombres de destino.  Reemplazar `my-source-namespace` y `my-destination-namespace` con información de tu entorno.
++
+[source, yaml]
+----
+---
+apiVersion: protect.trident.netapp.io/v1
+kind: SnapshotRestore
+metadata:
+  name: my-cr-name
+  namespace: trident-protect
+spec:
+  appArchivePath: my-snapshot-path
+  appVaultRef: appvault-name
+  namespaceMapping: [{"source": "my-source-namespace", "destination": "my-destination-namespace"}]
+----
+
+
+. Opcionalmente, si necesita seleccionar solo ciertos recursos de la aplicación para restaurar, agregue un filtro que incluya o excluya los recursos marcados con etiquetas particulares:
++
+** *resourceFilter.resourceSelectionCriteria*: (Obligatorio para filtrar) Usar `include or exclude` para incluir o excluir un recurso definido en resourceMatchers.  Agregue los siguientes parámetros resourceMatchers para definir los recursos que se incluirán o excluirán:
++
+*** *resourceFilter.resourceMatchers*: Una matriz de objetos resourceMatcher.  Si defines varios elementos en esta matriz, coinciden como una operación OR, y los campos dentro de cada elemento (grupo, tipo, versión) coinciden como una operación AND.
++
+**** *resourceMatchers[].group*: (_Opcional_) Grupo del recurso a filtrar.
+**** *resourceMatchers[].kind*: (_Opcional_) Tipo de recurso a filtrar.
+**** *resourceMatchers[].version*: (_Opcional_) Versión del recurso a filtrar.
+**** *resourceMatchers[].names*: (_Opcional_) Nombres en el campo metadata.name de Kubernetes del recurso que se va a filtrar.
+**** *resourceMatchers[].namespaces*: (_Opcional_) Espacios de nombres en el campo metadata.name de Kubernetes del recurso que se va a filtrar.
+**** *resourceMatchers[].labelSelectors*: (_Opcional_) Cadena de selector de etiquetas en el campo metadata.name de Kubernetes del recurso, tal como se define en el https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors["Documentación de Kubernetes"^] .  Por ejemplo: `"trident.netapp.io/os=linux"` .
++
+Por ejemplo:
+
++
+[source, yaml]
+----
+spec:
+  resourceFilter:
+    resourceSelectionCriteria: "include"
+    resourceMatchers:
+      - group: my-resource-group-1
+        kind: my-resource-kind-1
+        version: my-resource-version-1
+        names: ["my-resource-names"]
+        namespaces: ["my-resource-namespaces"]
+        labelSelectors: ["trident.netapp.io/os=linux"]
+      - group: my-resource-group-2
+        kind: my-resource-kind-2
+        version: my-resource-version-2
+        names: ["my-resource-names"]
+        namespaces: ["my-resource-namespaces"]
+        labelSelectors: ["trident.netapp.io/os=linux"]
+----
+
+
+
+
+
+
+. Después de rellenar el `trident-protect-snapshot-restore-cr.yaml` Archivo con los valores correctos, aplicar el CR:
++
+[source, console]
+----
+kubectl apply -f trident-protect-snapshot-restore-cr.yaml
+----
+
+
+--
+.Restaure la instantánea mediante la CLI.
+--
+.Pasos
+. Restaure la instantánea en un espacio de nombres diferente, reemplazando los valores entre corchetes con información de su entorno.
++
+** El `snapshot` El argumento utiliza un espacio de nombres y un nombre de instantánea en el formato `<namespace>/<name>` .
+** El `namespace-mapping` El argumento utiliza espacios de nombres separados por dos puntos para asignar los espacios de nombres de origen a los espacios de nombres de destino correctos en el formato `source1:dest1,source2:dest2` .
++
+Por ejemplo:
+
++
+[source, console]
+----
+tridentctl-protect create snapshotrestore <my_restore_name> --snapshot <namespace/snapshot_to_restore> --namespace-mapping <source_to_destination_namespace_mapping>
+----
+
+
+
+
+--
+====

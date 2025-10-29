@@ -1,0 +1,181 @@
+---
+sidebar: sidebar 
+permalink: trident-protect/trident-protect-requirements.html 
+keywords: trident protect, application, cluster, snapmirror replication, ontap, configuration 
+summary: Comience por verificar que su entorno operativo, clústeres de aplicaciones, aplicaciones y licencias estén listos.  Asegúrese de que su entorno cumpla con estos requisitos para implementar y operar Trident Protect. 
+---
+= Requisitos de protección de Trident
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ../media/
+
+
+[role="lead"]
+Comience por verificar que su entorno operativo, clústeres de aplicaciones, aplicaciones y licencias estén listos.  Asegúrese de que su entorno cumpla con estos requisitos para implementar y operar Trident Protect.
+
+
+
+== Trident protege la compatibilidad de clústeres de Kubernetes
+
+Trident Protect es compatible con una amplia gama de ofertas de Kubernetes totalmente gestionadas y autogestionadas, incluidas:
+
+* Servicio Amazon Elastic Kubernetes (EKS)
+* Motor Google Kubernetes (GKE)
+* Servicio de Kubernetes de Microsoft Azure (AKS)
+* Red Hat OpenShift
+* SUSE Rancher
+* Cartera de VMware Tanzu
+* Kubernetes ascendente
+
+
+[NOTE]
+====
+* Las copias de seguridad de Trident Protect solo se admiten en nodos de cómputo de Linux. Los nodos de cómputo de Windows no son compatibles con operaciones de copia de seguridad.
+* Asegúrese de que el clúster en el que instale Trident Protect esté configurado con un controlador de instantáneas en ejecución y los CRD relacionados.  Para instalar un controlador de instantáneas, consulte https://docs.netapp.com/us-en/trident/trident-use/vol-snapshots.html#deploy-a-volume-snapshot-controller["estas instrucciones"] .
+
+
+====
+
+
+== Compatibilidad del backend de almacenamiento de Trident Protect
+
+Trident Protect admite los siguientes sistemas de almacenamiento:
+
+* Amazon FSx for NetApp ONTAP
+* Cloud Volumes ONTAP
+* matrices de almacenamiento ONTAP
+* Google Cloud NetApp Volumes
+* Azure NetApp Files
+
+
+Asegúrese de que su sistema de almacenamiento cumpla con los siguientes requisitos:
+
+* Asegúrese de que el almacenamiento NetApp conectado al clúster utilice Trident 24.02 o posterior (se recomienda Trident 24.10).
+
+
+* Asegúrese de tener un backend de almacenamiento NetApp ONTAP .
+* Asegúrese de haber configurado un bucket de almacenamiento de objetos para almacenar las copias de seguridad.
+* Cree los espacios de nombres de aplicación que planee utilizar para las aplicaciones o las operaciones de administración de datos de las aplicaciones.  Trident Protect no crea estos espacios de nombres automáticamente; si especifica un espacio de nombres inexistente en un recurso personalizado, la operación fallará.
+
+
+
+
+== Requisitos para volúmenes nas-economy
+
+Trident Protect admite operaciones de copia de seguridad y restauración en volúmenes nas-economy.  Actualmente no se admiten instantáneas, clones ni replicación SnapMirror a volúmenes nas-economy.  Debe habilitar un directorio de instantáneas para cada volumen nas-economy que planee usar con Trident Protect.
+
+[NOTE]
+====
+Algunas aplicaciones no son compatibles con volúmenes que utilizan un directorio de instantáneas.  Para estas aplicaciones, debe ocultar el directorio de instantáneas ejecutando el siguiente comando en el sistema de almacenamiento ONTAP :
+
+[source, console]
+----
+nfs modify -vserver <svm> -v3-hide-snapshot enabled
+----
+====
+Puede habilitar el directorio de instantáneas ejecutando el siguiente comando para cada volumen nas-economy, reemplazando `<volume-UUID>` con el UUID del volumen que desea cambiar:
+
+[source, console]
+----
+tridentctl update volume <volume-UUID> --snapshot-dir=true --pool-level=true -n trident
+----
+
+NOTE: Puede habilitar los directorios de instantáneas de forma predeterminada para los nuevos volúmenes configurando la opción de configuración del backend de Trident. `snapshotDir` a `true` .  Los volúmenes existentes no se ven afectados.
+
+
+
+== Protección de datos con máquinas virtuales KubeVirt
+
+Trident Protect 24.10 y 24.10.1 y versiones posteriores tienen un comportamiento diferente al proteger aplicaciones que se ejecutan en máquinas virtuales KubeVirt.  En ambas versiones, puede habilitar o deshabilitar la congelación y descongelación del sistema de archivos durante las operaciones de protección de datos.
+
+
+NOTE: Durante las operaciones de restauración, cualquier `VirtualMachineSnapshots` Los archivos creados para una máquina virtual (VM) no se restauran.
+
+.Trident protege 24.10
+Trident Protect 24.10 no garantiza automáticamente un estado consistente para los sistemas de archivos de las máquinas virtuales KubeVirt durante las operaciones de protección de datos.  Si desea proteger los datos de su máquina virtual KubeVirt utilizando Trident protect 24.10, deberá habilitar manualmente la funcionalidad de congelación/descongelación para los sistemas de archivos antes de la operación de protección de datos.  Esto garantiza que los sistemas de archivos se encuentren en un estado consistente.
+
+Puede configurar Trident Protect 24.10 para gestionar la congelación y descongelación del sistema de archivos de la máquina virtual durante las operaciones de protección de datos mediantelink:https://docs.openshift.com/container-platform/4.16/virt/install/installing-virt.html["configuración de la virtualización"^] y luego utilizando el siguiente comando:
+
+[source, console]
+----
+kubectl set env deployment/trident-protect-controller-manager NEPTUNE_VM_FREEZE=true -n trident-protect
+----
+.Trident Protect 24.10.1 y versiones posteriores
+A partir de Trident protect 24.10.1, Trident protect congela y descongela automáticamente los sistemas de archivos KubeVirt durante las operaciones de protección de datos.  Opcionalmente, puede desactivar este comportamiento automático mediante el siguiente comando:
+
+[source, console]
+----
+kubectl set env deployment/trident-protect-controller-manager NEPTUNE_VM_FREEZE=false -n trident-protect
+----
+
+
+== Requisitos para la replicación de SnapMirror
+
+La replicación NetApp SnapMirror está disponible para su uso con Trident Protect para las siguientes soluciones ONTAP :
+
+* Clústeres NetApp FAS, AFF y ASA locales
+* Selección de NetApp ONTAP Select
+* Volúmenes en la nube de NetApp Cloud Volumes ONTAP
+* Amazon FSx for NetApp ONTAP
+
+
+
+
+=== Requisitos del clúster ONTAP para la replicación SnapMirror
+
+Asegúrese de que su clúster ONTAP cumpla con los siguientes requisitos si planea utilizar la replicación SnapMirror :
+
+* * NetApp Trident*: NetApp Trident debe existir tanto en el clúster de Kubernetes de origen como en el de destino que utilizan ONTAP como backend.  Trident Protect admite la replicación con la tecnología NetApp SnapMirror mediante clases de almacenamiento compatibles con los siguientes controladores:
++
+** `ontap-nas`NFS
+** `ontap-san`iSCSI
+** `ontap-san`: FC
+** `ontap-san`: NVMe/TCP (requiere como mínimo la versión 9.15.1 de ONTAP )
+
+
+* *Licencias*: Las licencias asíncronas de ONTAP SnapMirror que utilizan el paquete de protección de datos deben estar habilitadas tanto en el clúster ONTAP de origen como en el de destino.  Referirse a https://docs.netapp.com/us-en/ontap/data-protection/snapmirror-licensing-concept.html["Información general sobre licencias de SnapMirror en ONTAP"^] Para más información.
++
+A partir de ONTAP 9.10.1, todas las licencias se entregan como un archivo de licencia de NetApp (NLF), que es un único archivo que habilita múltiples funciones.  Referirse alink:https://docs.netapp.com/us-en/ontap/system-admin/manage-licenses-concept.html#licenses-included-with-ontap-one["Licencias incluidas con ONTAP One"^] Para más información.
+
++
+
+NOTE: Solo se admite la protección asíncrona de SnapMirror .
+
+
+
+
+
+=== Consideraciones de interconexión para la replicación de SnapMirror
+
+Asegúrese de que su entorno cumpla los siguientes requisitos si planea utilizar el emparejamiento de backend de almacenamiento:
+
+* *Clúster y SVM*: Los backends de almacenamiento ONTAP deben estar interconectados.  Referirse a https://docs.netapp.com/us-en/ontap/peering/index.html["Descripción general del emparejamiento de clústeres y SVM"^] Para más información.
++
+
+NOTE: Asegúrese de que los nombres de SVM utilizados en la relación de replicación entre dos clústeres ONTAP sean únicos.
+
+* * NetApp Trident y SVM*: Las SVM remotas emparejadas deben estar disponibles para NetApp Trident en el clúster de destino.
+* *Backends gestionados*: Debe agregar y gestionar backends de almacenamiento ONTAP en Trident Protect para crear una relación de replicación.
+
+
+
+
+=== Configuración de Trident / ONTAP para la replicación de SnapMirror
+
+Trident Protect requiere que configure al menos un backend de almacenamiento que admita la replicación tanto para los clústeres de origen como para los de destino.  Si los clústeres de origen y destino son los mismos, la aplicación de destino debería utilizar un backend de almacenamiento diferente al de la aplicación de origen para lograr la mejor resiliencia.
+
+
+
+=== Requisitos del clúster de Kubernetes para la replicación de SnapMirror
+
+Asegúrese de que sus clústeres de Kubernetes cumplan los siguientes requisitos:
+
+* *Accesibilidad a AppVault*: Tanto el clúster de origen como el de destino deben tener acceso a la red para leer y escribir en AppVault para la replicación de objetos de la aplicación.
+* *Conectividad de red*: Configure las reglas del firewall, los permisos de los buckets y las listas blancas de IP para habilitar la comunicación entre ambos clústeres y AppVault a través de las WAN.
+
+
+
+NOTE: Muchos entornos empresariales implementan políticas de firewall estrictas en las conexiones WAN.  Verifique estos requisitos de red con su equipo de infraestructura antes de configurar la replicación.

@@ -1,0 +1,100 @@
+---
+sidebar: sidebar 
+permalink: trident-use/manage-stor-class.html 
+keywords: storage class, manage storage class, storage classes, kubernetes storage classes 
+summary: Puede ver las clases de almacenamiento existentes, establecer una clase de almacenamiento predeterminada, identificar el backend de la clase de almacenamiento y eliminar clases de almacenamiento. 
+---
+= Gestionar clases de almacenamiento
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+[role="lead"]
+Puede ver las clases de almacenamiento existentes, establecer una clase de almacenamiento predeterminada, identificar el backend de la clase de almacenamiento y eliminar clases de almacenamiento.
+
+
+
+== Vea las clases de almacenamiento existentes
+
+* Para ver las clases de almacenamiento de Kubernetes existentes, ejecute el siguiente comando:
+
+
+[listing]
+----
+kubectl get storageclass
+----
+* Para ver los detalles de la clase de almacenamiento de Kubernetes, ejecute el siguiente comando:
+
+
+[listing]
+----
+kubectl get storageclass <storage-class> -o json
+----
+* Para ver las clases de almacenamiento sincronizadas de Trident, ejecute el siguiente comando:
+
+
+[listing]
+----
+tridentctl get storageclass
+----
+* Para ver los detalles de la clase de almacenamiento sincronizado de Trident, ejecute el siguiente comando:
+
+
+[listing]
+----
+tridentctl get storageclass <storage-class> -o json
+----
+
+
+== Establecer una clase de almacenamiento predeterminada
+
+Kubernetes 1.6 añadió la capacidad de establecer una clase de almacenamiento predeterminada.  Esta es la clase de almacenamiento que se utilizará para aprovisionar un volumen persistente si un usuario no especifica uno en una reclamación de volumen persistente (PVC).
+
+* Define una clase de almacenamiento predeterminada configurando la anotación. `storageclass.kubernetes.io/is-default-class` a verdadero en la definición de la clase de almacenamiento.  Según la especificación, cualquier otro valor o la ausencia de la anotación se interpreta como falso.
+* Puede configurar una clase de almacenamiento existente como clase de almacenamiento predeterminada mediante el siguiente comando:
+
+
+[listing]
+----
+kubectl patch storageclass <storage-class-name> -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+----
+* De igual forma, puede eliminar la anotación de la clase de almacenamiento predeterminada mediante el siguiente comando:
+
+
+[listing]
+----
+kubectl patch storageclass <storage-class-name> -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+----
+También hay ejemplos en el paquete de instalación de Trident que incluyen esta anotación.
+
+
+NOTE: Solo debe haber una clase de almacenamiento predeterminada en su clúster a la vez.  Técnicamente, Kubernetes no impide tener más de una, pero se comportará como si no existiera ninguna clase de almacenamiento predeterminada.
+
+
+
+== Identificar el backend para una clase de almacenamiento
+
+Este es un ejemplo del tipo de preguntas que puedes responder con el JSON que `tridentctl` Salidas para objetos backend de Trident .  Esto utiliza el `jq` utilidad, que tal vez necesites instalar primero.
+
+[listing]
+----
+tridentctl get storageclass -o json | jq  '[.items[] | {storageClass: .Config.name, backends: [.storage]|unique}]'
+----
+
+
+== Eliminar una clase de almacenamiento
+
+Para eliminar una clase de almacenamiento de Kubernetes, ejecute el siguiente comando:
+
+[listing]
+----
+kubectl delete storageclass <storage-class>
+----
+`<storage-class>`debe reemplazarse con su clase de almacenamiento.
+
+Los volúmenes persistentes que se hayan creado mediante esta clase de almacenamiento permanecerán intactos y Trident seguirá gestionándolos.
+
+
+NOTE: Trident impone un espacio en blanco `fsType` por los volúmenes que crea.  Para los backends iSCSI, se recomienda aplicar `parameters.fsType` en la clase de almacenamiento.  Debes eliminar las StorageClasses existentes y volver a crearlas con `parameters.fsType` especificado.

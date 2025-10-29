@@ -1,0 +1,68 @@
+---
+sidebar: sidebar 
+permalink: trident-concepts/virtual-storage-pool.html 
+keywords: virtual pools, Trident, backends 
+summary: Los pools virtuales proporcionan una capa de abstracción entre los backends de almacenamiento de Trident y las StorageClasses de Kubernetes.  Permiten que un administrador defina aspectos, como la ubicación, el rendimiento y la protección de cada backend, de una manera común e independiente del backend, sin necesidad de que una StorageClass especifique qué backend físico, grupo de backends o tipo de backend utilizar para cumplir con los criterios deseados. 
+---
+= piscinas virtuales
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+[role="lead"]
+Los pools virtuales proporcionan una capa de abstracción entre los backends de almacenamiento de Trident y Kubernetes. `StorageClasses` .  Permiten a un administrador definir aspectos, como la ubicación, el rendimiento y la protección de cada backend, de una manera común e independiente del backend, sin necesidad de realizar una configuración específica. `StorageClass` Especifique qué backend físico, grupo de backends o tipo de backend utilizar para cumplir con los criterios deseados.
+
+
+
+== Aprende sobre piscinas virtuales
+
+El administrador de almacenamiento puede definir grupos virtuales en cualquiera de los backends de Trident en un archivo de definición JSON o YAML.
+
+image::virtual_storage_pools.png[Muestra el diagrama conceptual de las piscinas virtuales.]
+
+Cualquier aspecto especificado fuera de la lista de grupos virtuales es global para el backend y se aplicará a todos los grupos virtuales, mientras que cada grupo virtual puede especificar uno o más aspectos individualmente (anulando cualquier aspecto global del backend).
+
+[NOTE]
+====
+* Al definir grupos virtuales, no intente reorganizar el orden de los grupos virtuales existentes en una definición de backend.
+* Desaconsejamos modificar los atributos de un grupo virtual existente.  Deberás definir un nuevo grupo virtual para realizar cambios.
+
+
+====
+La mayoría de los aspectos se especifican en términos específicos del backend.  Fundamentalmente, los valores de aspecto no se exponen fuera del controlador del backend y no están disponibles para la comparación en `StorageClasses` En cambio, el administrador define una o más etiquetas para cada grupo virtual.  Cada etiqueta es un par clave:valor, y las etiquetas pueden ser comunes en diferentes sistemas backend.  Al igual que los aspectos, las etiquetas se pueden especificar por grupo o de forma global para el backend.  A diferencia de los aspectos, que tienen nombres y valores predefinidos, el administrador tiene plena discreción para definir las claves y los valores de las etiquetas según sea necesario.  Para mayor comodidad, los administradores de almacenamiento pueden definir etiquetas por grupo virtual y agrupar volúmenes por etiqueta.
+
+Las etiquetas del pool virtual se pueden desafiar usando estos caracteres:
+
+* letras mayúsculas `A-Z`
+* letras minúsculas `a-z`
+* números `0-9`
+* subraya `_`
+* guiones `-`
+
+
+A `StorageClass` identifica qué pool virtual utilizar haciendo referencia a las etiquetas dentro de un parámetro selector.  Los selectores de grupos virtuales admiten los siguientes operadores:
+
+[cols="14%,34%,52%"]
+|===
+| Operador | Ejemplo | El valor de la etiqueta de un pool debe: 
+
+
+| `=` | rendimiento=premium | Fósforo 
+
+
+| `!=` | rendimiento != extremo | No coinciden 
+
+
+| `in` | ubicación en (este, oeste) | Pertenece al conjunto de valores 
+
+
+| `notin` | Nota de rendimiento (plata, bronce) | No pertenecer al conjunto de valores 
+
+
+| `<key>` | protección | Existe con cualquier valor 
+
+
+| `!<key>` | !protección | No existe 
+|===

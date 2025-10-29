@@ -1,0 +1,85 @@
+---
+sidebar: sidebar 
+permalink: trident-managing-k8s/upgrade-trident.html 
+keywords: upgrade, trident, methods, operator, tridentctl, helm 
+summary: Trident sigue un ciclo de lanzamientos de cuatro meses, publicando tres versiones principales cada año natural.  Cada nueva versión se basa en las versiones anteriores, proporcionando nuevas funciones y mejoras de rendimiento, así como correcciones de errores y mejoras generales.  Se recomienda actualizar al menos una vez al año para aprovechar las nuevas funciones de Trident. 
+---
+= Mejora el Trident
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+[role="lead"]
+A partir de la versión 24.02, Trident sigue una cadencia de lanzamientos de cuatro meses, ofreciendo tres versiones principales cada año calendario.  Cada nueva versión se basa en las versiones anteriores y proporciona nuevas funciones, mejoras de rendimiento, correcciones de errores y mejoras generales.  Le recomendamos que actualice al menos una vez al año para aprovechar las nuevas funciones de Trident.
+
+
+
+== Consideraciones previas a la actualización
+
+Al actualizar a la última versión de Trident, tenga en cuenta lo siguiente:
+
+* Solo debe haber una instancia de Trident instalada en todos los espacios de nombres de un clúster de Kubernetes determinado.
+* Trident 23.07 y versiones posteriores requieren instantáneas de volumen v1 y ya no admiten instantáneas alfa o beta.
+* Si creó un Cloud Volumes Service para Google Cloud en ellink:../trident-use/gcp.html#learn-about-trident-support-for-cloud-volumes-service-for-google-cloud["Tipo de servicio CVS"] , debes actualizar la configuración del backend para usar el `standardsw` o `zoneredundantstandardsw` Nivel de servicio al actualizar desde Trident 23.01.  No actualizar el `serviceLevel` en el backend podría provocar fallos en los volúmenes. Referirse a link:../trident-use/gcp.html#cvs-service-type-examples["Ejemplos de tipos de servicio de CVS"] Para más detalles.
+* Al actualizar, es importante que proporcione `parameter.fsType` en `StorageClasses` Utilizado por Trident.  Puedes eliminar y volver a crear `StorageClasses` sin alterar los volúmenes preexistentes.
++
+** Este es un **requisito** para hacer cumplir la ley. https://kubernetes.io/docs/tasks/configure-pod-container/security-context/["contextos de seguridad"^] para volúmenes SAN.
+** El directorio https://github.com/NetApp/trident/tree/master/trident-installer/sample-input [ejemplo de entrada^] contiene ejemplos, como https://github.com/NetApp/trident/blob/master/trident-installer/sample-input/storage-class-samples/storage-class-basic.yaml.templ[`storage-class-basic.yaml.templ` ^] y enlace: https://github.com/NetApp/trident/blob/master/trident-installer/sample-input/storage-class-samples/storage-class-bronze-default.yaml[`storage-class-bronze-default.yaml` ^].
+** Para obtener más información, consultelink:../trident-rn.html["Problemas conocidos"] .
+
+
+
+
+
+
+== Paso 1: Seleccione una versión
+
+Las versiones de Trident siguen una fecha. `YY.MM` Convención de nomenclatura, donde "YY" son los dos últimos dígitos del año y "MM" es el mes.  Los lanzamientos de Dot siguen a `YY.MM.X` convención, donde "X" es el nivel de parche.  Seleccionarás la versión a la que deseas actualizar en función de la versión desde la que estás actualizando.
+
+* Puede realizar una actualización directa a cualquier versión objetivo que se encuentre dentro de un rango de cuatro versiones con respecto a su versión instalada.  Por ejemplo, puede actualizar directamente desde la versión 24.06 (o cualquier versión derivada de la 24.06) a la versión 25.06.
+* Si está actualizando desde una versión que no se encuentra dentro del período de cuatro versiones, realice una actualización en varios pasos.  Utilice las instrucciones de actualización paralink:../earlier-versions.html["versión anterior"] Estás actualizando a la versión más reciente que se ajusta al período de cuatro versiones.  Por ejemplo, si está utilizando la versión 23.07 y desea actualizar a la versión 25.06:
++
+.. Primera actualización de la versión 23.07 a la 24.06.
+.. Luego, actualice de la versión 24.06 a la 25.06.
+
+
+
+
+
+NOTE: Al actualizar utilizando el operador Trident en OpenShift Container Platform, debe actualizar a Trident 21.01.1 o posterior.  El operador Trident lanzado con la versión 21.01.0 contiene un problema conocido que se ha corregido en la versión 21.01.1.  Para obtener más detalles, consulte el https://github.com/NetApp/trident/issues/517["Detalles del problema en GitHub"^] .
+
+
+
+== Paso 2: Determinar el método de instalación original
+
+Para determinar qué versión utilizó para instalar Trident originalmente:
+
+. Usar `kubectl get pods -n trident` para examinar las vainas.
++
+** Si no hay ningún pod de operador, Trident se instaló mediante `tridentctl` .
+** Si existe un pod de operador, Trident se instaló utilizando el operador Trident , ya sea manualmente o utilizando Helm.
+
+
+. Si hay un pod de operador, utilice `kubectl describe torc` para determinar si Trident se instaló utilizando Helm.
++
+** Si aparece una etiqueta Helm, Trident se instaló utilizando Helm.
+** Si no hay ninguna etiqueta Helm, Trident se instaló manualmente utilizando el operador Trident .
+
+
+
+
+
+
+== Paso 3: Seleccione un método de actualización
+
+Generalmente, debes actualizar utilizando el mismo método que usaste para la instalación inicial; sin embargo, puedeslink:../trident-get-started/kubernetes-deploy.html#moving-between-installation-methods["cambiar entre métodos de instalación"] .  Existen dos opciones para actualizar Trident.
+
+* link:upgrade-operator.html["Actualizar usando el operador Trident"]
++
+
+TIP: Le sugerimos que reviselink:upgrade-operator-overview.html["Comprender el flujo de trabajo de actualización del operador"] antes de actualizar con el operador.
+
+* 
+

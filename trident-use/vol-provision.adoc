@@ -1,0 +1,166 @@
+---
+sidebar: sidebar 
+permalink: trident-use/vol-provision.html 
+keywords: volumes, pvc, pv, persistentvolume, persistentvolumeclaim, mount, pod, provision 
+summary: 'Cree un PersistentVolume (PV) y un PersistentVolumeClaim (PVC) que utilice la StorageClass de Kubernetes configurada para solicitar acceso al PV.  Luego puedes montar el panel fotovoltaico en un soporte.' 
+---
+= Provisión de un volumen
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+[role="lead"]
+Cree un PersistentVolumeClaim (PVC) que utilice la StorageClass de Kubernetes configurada para solicitar acceso al PV.  Luego puedes montar el panel fotovoltaico en un soporte.
+
+
+
+== Descripción general
+
+A https://kubernetes.io/docs/concepts/storage/persistent-volumes["_Reclamación de volumen persistente_"^] (PVC) es una solicitud de acceso al PersistentVolume en el clúster.
+
+El PVC se puede configurar para solicitar el almacenamiento de un tamaño o modo de acceso determinado.  Mediante la StorageClass asociada, el administrador del clúster puede controlar más que el tamaño del PersistentVolume y el modo de acceso, como el rendimiento o el nivel de servicio.
+
+Una vez creado el PVC, puede montar el volumen en un soporte.
+
+
+
+== Crea el PVC
+
+.Pasos
+. Crear el PVC.
++
+[listing]
+----
+kubectl create -f pvc.yaml
+----
+. Verifique el estado del PVC.
++
+[listing]
+----
+kubectl get pvc
+----
+
+
+[listing]
+----
+NAME        STATUS  VOLUME     CAPACITY   ACCESS MODES  STORAGECLASS AGE
+pvc-storage Bound   pv-name    1Gi        RWO                  5m
+----
+. Monte el volumen en una cápsula.
++
+[listing]
+----
+kubectl create -f pv-pod.yaml
+----
++
+
+NOTE: Puedes supervisar el progreso usando `kubectl get pod --watch` .
+
+. Verifique que el volumen esté montado en `/my/mount/path` .
++
+[listing]
+----
+kubectl exec -it task-pv-pod -- df -h /my/mount/path
+----
+. Ahora puedes eliminar el Pod.  La aplicación Pod dejará de existir, pero el volumen se mantendrá.
++
+[listing]
+----
+kubectl delete pod pv-pod
+----
+
+
+
+
+=== Ejemplos de manifiestos
+
+.Muestra de PersistentVolumeClaim
+[%collapsible]
+====
+Estos ejemplos muestran opciones básicas de configuración de PVC.
+
+.PVC con acceso RWO
+Este ejemplo muestra un PVC básico con acceso RWO que está asociado a una StorageClass llamada `basic-csi` .
+
+[source, yaml]
+----
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvc-storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: basic-csi
+----
+.PVC con NVMe/TCP
+Este ejemplo muestra un PVC básico para NVMe/TCP con acceso RWO que está asociado con una StorageClass llamada `protection-gold` .
+
+[source, yaml]
+----
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+name: pvc-san-nvme
+spec:
+accessModes:
+  - ReadWriteOnce
+resources:
+  requests:
+    storage: 300Mi
+storageClassName: protection-gold
+----
+====
+.Ejemplos de manifiesto de Pod
+[%collapsible]
+====
+Estos ejemplos muestran configuraciones básicas para unir el PVC a un módulo.
+
+.Configuración básica
+[source, yaml]
+----
+kind: Pod
+apiVersion: v1
+metadata:
+  name: pv-pod
+spec:
+  volumes:
+    - name: storage
+      persistentVolumeClaim:
+       claimName: pvc-storage
+  containers:
+    - name: pv-container
+      image: nginx
+      ports:
+        - containerPort: 80
+          name: "http-server"
+      volumeMounts:
+        - mountPath: "/my/mount/path"
+          name: storage
+----
+.Configuración básica NVMe/TCP
+[source, yaml]
+----
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-nginx
+spec:
+  volumes:
+    - name: basic-pvc
+      persistentVolumeClaim:
+        claimName: pvc-san-nvme
+  containers:
+    - name: task-pv-container
+      image: nginx
+      volumeMounts:
+        - mountPath: "/my/mount/path"
+          name: basic-pvc
+----
+====
+Referirse alink:../trident-reference/objects.html["Objetos de Kubernetes y Trident"] Para obtener detalles sobre cómo interactúan las clases de almacenamiento con `PersistentVolumeClaim` y parámetros para controlar cómo Trident gestiona los volúmenes.

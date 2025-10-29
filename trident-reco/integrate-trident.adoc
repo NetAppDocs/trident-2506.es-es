@@ -1,0 +1,437 @@
+---
+sidebar: sidebar 
+permalink: trident-reco/integrate-trident.html 
+keywords: kubernetes, clusters, nodes, components, master, compute, fsx, flexgroup, flexvolume, solidfire, hci, virtual pool, cvs, gcp, volumes 
+summary: Un clúster de Kubernetes normalmente consta de dos tipos de nodos, cada uno responsable de diferentes aspectos de su funcionalidad. 
+---
+= Integrar Trident
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+[role="lead"]
+Para integrar Trident, se requiere la integración de los siguientes elementos de diseño y arquitectura: selección e implementación de controladores, diseño de clases de almacenamiento, diseño de grupos virtuales, impactos de Persistent Volume Claim (PVC) en el aprovisionamiento de almacenamiento, operaciones de volumen e implementación de servicios de OpenShift utilizando Trident.
+
+
+
+== Selección y despliegue de controladores
+
+Seleccione e implemente un controlador de backend para su sistema de almacenamiento.
+
+
+
+=== Controladores de backend de ONTAP
+
+Los controladores backend de ONTAP se diferencian por el protocolo utilizado y la forma en que se aprovisionan los volúmenes en el sistema de almacenamiento.  Por lo tanto, considere cuidadosamente qué controlador implementar.
+
+En un nivel superior, si su aplicación tiene componentes que necesitan almacenamiento compartido (varios pods que acceden al mismo PVC), los controladores basados en NAS serían la opción predeterminada, mientras que los controladores iSCSI basados en bloques satisfacen las necesidades de almacenamiento no compartido.  Elija el protocolo en función de los requisitos de la aplicación y el nivel de familiaridad de los equipos de almacenamiento e infraestructura.  En términos generales, hay poca diferencia entre ellos para la mayoría de las aplicaciones, por lo que a menudo la decisión se basa en si se necesita o no almacenamiento compartido (donde más de un pod necesitará acceso simultáneo).
+
+Los controladores de backend de ONTAP disponibles son:
+
+* `ontap-nas`Cada PV aprovisionado es un ONTAP FlexVolume completo.
+* `ontap-nas-economy`Cada PV aprovisionado es un qtree, con un número configurable de qtrees por FlexVolume (el valor predeterminado es 200).
+* `ontap-nas-flexgroup`Cada PV se aprovisiona como un ONTAP FlexGroup completo y se utilizan todos los agregados asignados a una SVM.
+* `ontap-san`Cada PV aprovisionado es un LUN dentro de su propio FlexVolume.
+* `ontap-san-economy`Cada PV aprovisionado es un LUN, con un número configurable de LUN por FlexVolume (el valor predeterminado es 100).
+
+
+Elegir entre los tres controladores NAS tiene algunas repercusiones en las funciones que se ponen a disposición de la aplicación.
+
+Tenga en cuenta que, en las tablas siguientes, no todas las capacidades están expuestas a través de Trident.  Algunas de estas funcionalidades deben ser aplicadas por el administrador de almacenamiento después del aprovisionamiento si se desea dicha funcionalidad.  Las notas a pie de página en superíndice distinguen la funcionalidad de cada característica y controlador.
+
+[cols="20,10,10,10,10,10,10,10"]
+|===
+| Controladores NAS ONTAP | Instantáneas | Clones | Políticas de exportación dinámicas | Multi-attach | Calidad de servicio | Cambiar tamaño | Replicación 
+
+
+| `ontap-nas` | Sí | Sí | Sí, nota al pie:5[] | Sí | Sí, nota al pie:1[] | Sí | Sí, nota al pie:1[] 
+
+
+| `ontap-nas-economy` | Sin nota al pie:3[] | Sin nota al pie:3[] | Sí, nota al pie:5[] | Sí | Sin nota al pie:3[] | Sí | Sin nota al pie:3[] 
+
+
+| `ontap-nas-flexgroup` | Sí, nota al pie:1[] | NO | Sí, nota al pie:5[] | Sí | Sí, nota al pie:1[] | Sí | Sí, nota al pie:1[] 
+|===
+Trident ofrece 2 controladores SAN para ONTAP, cuyas capacidades se muestran a continuación.
+
+[cols="20,10,10,10,10,10,10,10"]
+|===
+| Controladores SAN de ONTAP | Instantáneas | Clones | Multi-attach | CHAP bidireccional | Calidad de servicio | Cambiar tamaño | Replicación 
+
+
+| `ontap-san` | Sí | Sí | Sí, nota al pie:4[] | Sí | Sí, nota al pie:1[] | Sí | Sí, nota al pie:1[] 
+
+
+| `ontap-san-economy` | Sí | Sí | Sí, nota al pie:4[] | Sí | Sin nota al pie:3[] | Sí | Sin nota al pie:3[] 
+|===
+[verse]
+Nota al pie de las tablas anteriores: Sí (nota al pie 1): No gestionado por Trident. Sí (nota al pie 2): Gestionado por Trident, pero sin granularidad PV. No (nota al pie 3): No gestionado por Trident ni con granularidad PV. Sí (nota al pie 4): Compatible con volúmenes de bloques sin formato. Sí (nota al pie 5): Compatible con Trident.
+
+Las características que no son granulares a nivel de PV se aplican a todo el FlexVolume y todos los PV (es decir, qtrees o LUN en FlexVols compartidos) compartirán una programación común.
+
+Como podemos ver en las tablas anteriores, gran parte de la funcionalidad entre los `ontap-nas` y `ontap-nas-economy` es lo mismo.  Sin embargo, debido a que `ontap-nas-economy` El controlador limita la capacidad de controlar la programación a nivel de cada PV, lo que puede afectar especialmente a la planificación de la recuperación ante desastres y las copias de seguridad.  Para los equipos de desarrollo que deseen aprovechar la funcionalidad de clonación de PVC en el almacenamiento ONTAP , esto solo es posible al usar el `ontap-nas` , `ontap-san` o `ontap-san-economy` conductores.
+
+
+NOTE: El `solidfire-san` El controlador también es capaz de clonar PVC.
+
+
+
+=== Controladores de backend de Cloud Volumes ONTAP
+
+Cloud Volumes ONTAP proporciona control de datos junto con funciones de almacenamiento de clase empresarial para diversos casos de uso, incluyendo recursos compartidos de archivos y almacenamiento a nivel de bloque que admiten protocolos NAS y SAN (NFS, SMB/CIFS e iSCSI).  Los controladores compatibles para Cloud Volume ONTAP son `ontap-nas` , `ontap-nas-economy` , `ontap-san` y `ontap-san-economy` .  Estas son aplicables a Cloud Volume ONTAP para Azure y Cloud Volume ONTAP para GCP.
+
+
+
+=== Controladores de backend de Amazon FSx para ONTAP
+
+Amazon FSx for NetApp ONTAP le permite aprovechar las características, el rendimiento y las capacidades administrativas de NetApp con las que ya está familiarizado, al tiempo que se beneficia de la simplicidad, la agilidad, la seguridad y la escalabilidad del almacenamiento de datos en AWS.  FSx para ONTAP admite muchas funciones del sistema de archivos ONTAP y API de administración.  Los controladores compatibles para Cloud Volume ONTAP son `ontap-nas` , `ontap-nas-economy` , `ontap-nas-flexgroup` , `ontap-san` y `ontap-san-economy` .
+
+
+
+=== Controladores de backend NetApp HCI/ SolidFire
+
+El `solidfire-san` El controlador utilizado con las plataformas NetApp HCI/ SolidFire ayuda al administrador a configurar un backend de Element para Trident en función de los límites de QoS.  Si desea diseñar su backend para establecer límites de QoS específicos en los volúmenes aprovisionados por Trident, utilice `type` parámetro en el archivo backend.  El administrador también puede restringir el tamaño del volumen que se puede crear en el almacenamiento mediante la `limitVolumeSize` parámetro.  Actualmente, las funciones de almacenamiento de Element, como el cambio de tamaño y la replicación de volúmenes, no son compatibles con la versión anterior. `solidfire-san` conductor.  Estas operaciones deben realizarse manualmente a través de la interfaz web de Element Software.
+
+[cols="20,10,10,10,10,10,10,10"]
+|===
+| Controlador SolidFire | Instantáneas | Clones | Multi-attach | CHAP | Calidad de servicio | Cambiar tamaño | Replicación 
+
+
+| `solidfire-san` | Sí | Sí | Sí, nota al pie:2[] | Sí | Sí | Sí | Sí, nota al pie:1[] 
+|===
+[verse]
+Nota al pie: Sí (nota al pie 1): No gestionado por Trident. Sí (nota al pie 2): Compatible con volúmenes de bloques sin formato.
+
+
+
+=== Controladores de backend de Azure NetApp Files
+
+Trident utiliza el `azure-netapp-files` conductor para gestionar ellink:https://azure.microsoft.com/en-us/services/netapp/["Azure NetApp Files"^] servicio.
+
+Encontrará más información sobre este controlador y cómo configurarlo enlink:https://docs.netapp.com/us-en/trident/trident-use/anf.html["Configuración de backend de Trident para Azure NetApp Files"^] .
+
+[cols="20,10,10,10,10,10,10"]
+|===
+| Controlador de Azure NetApp Files | Instantáneas | Clones | Multi-attach | Calidad de servicio | Expandir | Replicación 
+
+
+| `azure-netapp-files` | Sí | Sí | Sí | Sí | Sí | Sí, nota al pie:1[] 
+|===
+[verse]
+Nota al pie: Sí. Nota al pie 1: No gestionado por Trident.
+
+
+
+=== Cloud Volumes Service en el controlador backend de Google Cloud
+
+Trident utiliza el `gcp-cvs` Controlador para conectarse con el Cloud Volumes Service en Google Cloud.
+
+El `gcp-cvs` El controlador utiliza grupos virtuales para abstraer el backend y permitir que Trident determine la ubicación del volumen.  El administrador define los grupos virtuales en el `backend.json` archivos.  Las clases de almacenamiento utilizan selectores para identificar los grupos virtuales por etiqueta.
+
+* Si se definen grupos virtuales en el backend, Trident intentará crear un volumen en los grupos de almacenamiento de Google Cloud a los que están limitados esos grupos virtuales.
+* Si no se definen grupos virtuales en el backend, Trident seleccionará un grupo de almacenamiento de Google Cloud de entre los grupos de almacenamiento disponibles en la región.
+
+
+Para configurar el backend de Google Cloud en Trident, debe especificar `projectNumber` , `apiRegion` , y `apiKey` en el archivo de backend.  Puedes encontrar el número de proyecto en la consola de Google Cloud.  La clave API se toma del archivo de clave privada de la cuenta de servicio que creó al configurar el acceso a la API para Cloud Volumes Service en Google Cloud.
+
+Para obtener detalles sobre los tipos y niveles de servicio de Cloud Volumes Service en Google Cloud, consulte:link:../trident-use/gcp.html["Obtenga más información sobre la compatibilidad de Trident con CVS para GCP"] .
+
+[cols="20,10,10,10,10,10,10"]
+|===
+| Controlador del Cloud Volumes Service para Google Cloud | Instantáneas | Clones | Multi-attach | Calidad de servicio | Expandir | Replicación 
+
+
+| `gcp-cvs` | Sí | Sí | Sí | Sí | Sí | Disponible únicamente en el tipo de servicio CVS-Performance. 
+|===
+[NOTE]
+====
+.Notas de replicación
+* La replicación no la gestiona Trident.
+* El clon se creará en el mismo grupo de almacenamiento que el volumen de origen.
+
+
+====
+
+
+== Diseño de clase de almacenamiento
+
+Es necesario configurar y aplicar clases de almacenamiento individuales para crear un objeto de clase de almacenamiento de Kubernetes.  En esta sección se explica cómo diseñar una clase de almacenamiento para su aplicación.
+
+
+
+=== Utilización específica del backend
+
+El filtrado se puede utilizar dentro de un objeto de clase de almacenamiento específico para determinar qué grupo o conjunto de grupos de almacenamiento se utilizará con esa clase de almacenamiento específica.  Se pueden configurar tres conjuntos de filtros en la clase de almacenamiento: `storagePools` , `additionalStoragePools` , y/o `excludeStoragePools` .
+
+El `storagePools` Este parámetro ayuda a restringir el almacenamiento al conjunto de pools que coincidan con los atributos especificados.  El `additionalStoragePools` El parámetro se utiliza para ampliar el conjunto de pools que Trident utiliza para el aprovisionamiento, junto con el conjunto de pools seleccionados por los atributos y `storagePools` parámetros.  Puede utilizar cualquiera de los parámetros por separado o ambos juntos para asegurarse de que se selecciona el conjunto adecuado de grupos de almacenamiento.
+
+El `excludeStoragePools` El parámetro se utiliza para excluir específicamente el conjunto de pools enumerados que coinciden con los atributos.
+
+
+
+=== Emular políticas de QoS
+
+Si desea diseñar clases de almacenamiento para emular políticas de calidad de servicio, cree una clase de almacenamiento con la siguiente estructura: `media` atributo como `hdd` o `ssd` .  Basado en el `media` Trident seleccionará el backend apropiado que corresponda al atributo mencionado en la clase de almacenamiento. `hdd` o `ssd` agrega para que coincida con el atributo de medios y luego dirige el aprovisionamiento de los volúmenes al agregado específico.  Por lo tanto, podemos crear una clase de almacenamiento PREMIUM que tendría `media` atributo establecido como `ssd` lo cual podría clasificarse como la política QoS PREMIUM.  Podemos crear otra clase de almacenamiento STANDARD que tendría el atributo de medios establecido como `hdd`, que podría clasificarse como la política QoS STANDARD.  También podríamos usar el atributo "IOPS" en la clase de almacenamiento para redirigir el aprovisionamiento a un dispositivo Element que se puede definir como una política de QoS.
+
+
+
+=== Utilizar el backend en función de características específicas
+
+Las clases de almacenamiento se pueden diseñar para dirigir el aprovisionamiento de volúmenes en un backend específico donde se habilitan funciones como el aprovisionamiento ligero y grueso, instantáneas, clones y cifrado.  Para especificar qué almacenamiento utilizar, cree clases de almacenamiento que especifiquen el backend apropiado con la función requerida habilitada.
+
+
+
+=== piscinas virtuales
+
+Los pools virtuales están disponibles para todos los backends de Trident .  Puedes definir grupos virtuales para cualquier backend, utilizando cualquier controlador que proporcione Trident .
+
+Los grupos virtuales permiten a un administrador crear un nivel de abstracción sobre los backends a los que se puede hacer referencia a través de clases de almacenamiento, para una mayor flexibilidad y una ubicación eficiente de los volúmenes en los backends.  Se pueden definir diferentes backends con la misma clase de servicio.  Además, se pueden crear múltiples grupos de almacenamiento en el mismo backend, pero con características diferentes.  Cuando una clase de almacenamiento se configura con un selector con etiquetas específicas, Trident elige un backend que coincida con todas las etiquetas del selector para ubicar el volumen.  Si las etiquetas del selector de clase de almacenamiento coinciden con varios grupos de almacenamiento, Trident elegirá uno de ellos para aprovisionar el volumen.
+
+
+
+== Diseño de piscina virtual
+
+Al crear un backend, generalmente se puede especificar un conjunto de parámetros. Antes, el administrador no podía crear otro backend con las mismas credenciales de almacenamiento y un conjunto de parámetros diferente. Con la introducción de los grupos virtuales, este problema se ha solucionado. Un grupo virtual es una abstracción de nivel entre el backend y la clase de almacenamiento de Kubernetes, que permite al administrador definir parámetros y etiquetas, a los que se puede hacer referencia mediante clases de almacenamiento de Kubernetes como selector, de forma independiente del backend. Se pueden definir grupos virtuales para todos los backends de NetApp compatibles con Trident. Esta lista incluye SolidFire/ NetApp HCI, ONTAP, Cloud Volumes Service en GCP y Azure NetApp Files.
+
+
+NOTE: Al definir grupos virtuales, se recomienda no intentar reorganizar el orden de los grupos virtuales existentes en una definición de backend.  También es recomendable no editar/modificar los atributos de un grupo virtual existente y, en su lugar, definir un nuevo grupo virtual.
+
+
+
+=== Emulación de diferentes niveles de servicio/QoS
+
+Es posible diseñar pools virtuales para emular clases de servicio.  Utilizando la implementación de grupo virtual para Cloud Volume Service para Azure NetApp Files, examinemos cómo podemos configurar diferentes clases de servicio.  Configure el backend de Azure NetApp Files con varias etiquetas que representen diferentes niveles de rendimiento.  Colocar `servicelevel` ajuste cada aspecto al nivel de rendimiento adecuado y añada los demás aspectos necesarios bajo cada etiqueta.  Ahora crea diferentes clases de almacenamiento de Kubernetes que se correspondan con diferentes grupos virtuales.  Utilizando el `parameters.selector` En cada campo, cada StorageClass especifica qué grupos virtuales se pueden usar para alojar un volumen.
+
+
+
+=== Asignación de un conjunto específico de aspectos
+
+Se pueden diseñar múltiples pools virtuales con un conjunto específico de aspectos a partir de un único backend de almacenamiento.  Para ello, configure el backend con múltiples etiquetas y establezca los aspectos necesarios bajo cada etiqueta.  Ahora crea diferentes clases de almacenamiento de Kubernetes usando `parameters.selector` campo que se asignaría a diferentes grupos virtuales.  Los volúmenes que se aprovisionan en el backend tendrán los aspectos definidos en el grupo virtual elegido.
+
+
+
+=== Características del PVC que afectan al aprovisionamiento de almacenamiento
+
+Algunos parámetros que van más allá de la clase de almacenamiento solicitada pueden afectar el proceso de decisión de aprovisionamiento de Trident al crear un PVC.
+
+
+
+=== Modo de acceso
+
+Al solicitar almacenamiento a través de un PVC, uno de los campos obligatorios es el modo de acceso.  El modo deseado puede afectar al backend seleccionado para alojar la solicitud de almacenamiento.
+
+Trident intentará hacer coincidir el protocolo de almacenamiento utilizado con el método de acceso especificado según la siguiente matriz.  Esto es independiente de la plataforma de almacenamiento subyacente.
+
+[cols="20,30,30,30"]
+|===
+|  | Leer y escribir una vez | Solo lecturaMuchos | LeerEscribirMuchos 
+
+
+| iSCSI | Sí | Sí | Sí (Bloque sin procesar) 
+
+
+| Sistema Nacional de Archivos | Sí | Sí | Sí 
+|===
+Una solicitud de PVC ReadWriteMany enviada a una implementación de Trident sin un backend NFS configurado dará como resultado que no se aprovisione ningún volumen.  Por este motivo, el solicitante deberá utilizar el modo de acceso adecuado para su aplicación.
+
+
+
+== Operaciones de volumen
+
+
+
+=== Modificar volúmenes persistentes
+
+Los volúmenes persistentes son, con dos excepciones, objetos inmutables en Kubernetes.  Una vez creada, la política de reclamaciones y su tamaño pueden modificarse.  Sin embargo, esto no impide que algunos aspectos del volumen se modifiquen fuera de Kubernetes.  Esto puede ser conveniente para personalizar el volumen para aplicaciones específicas, para garantizar que la capacidad no se consuma accidentalmente o simplemente para mover el volumen a un controlador de almacenamiento diferente por cualquier motivo.
+
+
+NOTE: Actualmente, los provisionadores integrados de Kubernetes no admiten operaciones de cambio de tamaño de volumen para PV NFS, iSCSI o FC.  Trident admite la expansión de volúmenes NFS, iSCSI y FC.
+
+Los detalles de conexión del PV no se pueden modificar después de su creación.
+
+
+
+=== Crear instantáneas de volumen bajo demanda
+
+Trident admite la creación de instantáneas de volumen bajo demanda y la creación de PVC a partir de instantáneas utilizando el marco CSI.  Las instantáneas proporcionan un método conveniente para mantener copias puntuales de los datos y tienen un ciclo de vida independiente del PV de origen en Kubernetes.  Estas instantáneas se pueden utilizar para clonar PVC.
+
+
+
+=== Crear volúmenes a partir de instantáneas
+
+Trident también admite la creación de PersistentVolumes a partir de instantáneas de volumen.  Para lograr esto, simplemente cree un PersistentVolumeClaim y mencione el `datasource` como la instantánea requerida a partir de la cual se debe crear el volumen.  Trident gestionará este PVC creando un volumen con los datos presentes en la instantánea.  Con esta función, es posible duplicar datos entre regiones, crear entornos de prueba, reemplazar un volumen de producción dañado o corrupto en su totalidad, o recuperar archivos y directorios específicos y transferirlos a otro volumen conectado.
+
+
+
+=== Mover volúmenes en el clúster
+
+Los administradores de almacenamiento tienen la capacidad de mover volúmenes entre agregados y controladores en el clúster ONTAP sin interrumpir el funcionamiento del consumidor de almacenamiento.  Esta operación no afecta a Trident ni al clúster de Kubernetes, siempre y cuando el agregado de destino sea uno al que tenga acceso la SVM que utiliza Trident .  Es importante destacar que, si el agregado se ha añadido recientemente al SVM, será necesario actualizar el backend volviéndolo a añadir a Trident.  Esto hará que Trident reinvente la SVM para que se reconozca el nuevo agregado.
+
+Sin embargo, Trident no admite automáticamente el traslado de volúmenes entre backends.  Esto incluye transferencias entre SVM en el mismo clúster, entre clústeres o a una plataforma de almacenamiento diferente (incluso si ese sistema de almacenamiento está conectado a Trident).
+
+Si se copia un volumen a otra ubicación, se puede utilizar la función de importación de volúmenes para importar los volúmenes actuales a Trident.
+
+
+
+=== Ampliar volúmenes
+
+Trident admite el cambio de tamaño de los volúmenes persistentes (PV) NFS, iSCSI y FC.  Esto permite a los usuarios cambiar el tamaño de sus volúmenes directamente a través de la capa de Kubernetes.  La expansión de volumen es posible para todas las principales plataformas de almacenamiento de NetApp , incluidos los backends de ONTAP, SolidFire/ NetApp HCI y Cloud Volumes Service .  Para permitir una posible expansión posterior, establezca `allowVolumeExpansion` a `true` en su StorageClass asociada con el volumen.  Siempre que sea necesario cambiar el tamaño del volumen persistente, edite el `spec.resources.requests.storage` anotación en la reclamación de volumen persistente al tamaño de volumen requerido.  Trident se encargará automáticamente de redimensionar el volumen en el clúster de almacenamiento.
+
+
+
+=== Importar un volumen existente a Kubernetes
+
+La importación de volúmenes ofrece la posibilidad de importar un volumen de almacenamiento existente a un entorno Kubernetes.  Actualmente, esto cuenta con el apoyo de `ontap-nas` , `ontap-nas-flexgroup` , `solidfire-san` , `azure-netapp-files` , y `gcp-cvs` conductores.  Esta función resulta útil al migrar una aplicación existente a Kubernetes o durante escenarios de recuperación ante desastres.
+
+Al utilizar ONTAP y `solidfire-san` Conductores, utilicen el comando `tridentctl import volume <backend-name> <volume-name> -f /path/pvc.yaml` Importar un volumen existente a Kubernetes para que sea administrado por Trident.  El archivo PVC YAML o JSON utilizado en el comando de importación de volumen apunta a una clase de almacenamiento que identifica a Trident como el proveedor.  Cuando utilice un backend NetApp HCI/ SolidFire , asegúrese de que los nombres de los volúmenes sean únicos.  Si los nombres de los volúmenes están duplicados, clone el volumen con un nombre único para que la función de importación de volúmenes pueda distinguirlos.
+
+Si el `azure-netapp-files` o `gcp-cvs` Se utiliza el controlador, utilice el comando `tridentctl import volume <backend-name> <volume path> -f /path/pvc.yaml` para importar el volumen a Kubernetes para que sea administrado por Trident.  Esto garantiza una referencia de volumen única.
+
+Cuando se ejecute el comando anterior, Trident encontrará el volumen en el servidor y leerá su tamaño.  Añadirá automáticamente (y sobrescribirá si es necesario) el tamaño de volumen configurado del PVC.  Luego, Trident crea el nuevo PV y Kubernetes vincula el PVC al PV.
+
+Si un contenedor se desplegara de forma que requiriera el PVC importado específico, permanecería en estado pendiente hasta que el par PVC/PV se vinculara mediante el proceso de importación de volumen.  Una vez unidos los pares PVC/PV, el contenedor debería subir, siempre que no haya otros problemas.
+
+
+
+=== Servicio de registro
+
+La implementación y la gestión del almacenamiento para el registro se han documentado enlink:https://netapp.io/["netapp.io"^] en ellink:https://netapp.io/2017/08/24/deploying-the-openshift-registry-using-netapp-storage/["blog"^] .
+
+
+
+=== Servicio de registro
+
+Al igual que otros servicios de OpenShift, el servicio de registro se implementa utilizando Ansible con parámetros de configuración proporcionados por el archivo de inventario, también conocido como hosts, que se proporciona al playbook.  Se abordarán dos métodos de instalación: la implementación del registro durante la instalación inicial de OpenShift y la implementación del registro después de que se haya instalado OpenShift.
+
+
+CAUTION: A partir de la versión 3.9 de Red Hat OpenShift, la documentación oficial desaconseja el uso de NFS para el servicio de registro debido a la preocupación por la corrupción de datos.  Esto se basa en las pruebas realizadas por Red Hat a sus productos.  El servidor NFS de ONTAP no presenta estos problemas y puede respaldar fácilmente una implementación de registro.  En última instancia, la elección del protocolo para el servicio de registro depende de usted; tenga en cuenta que ambos funcionarán perfectamente al usar plataformas NetApp y no hay razón para evitar NFS si esa es su preferencia.
+
+Si elige usar NFS con el servicio de registro, deberá configurar la variable de Ansible. `openshift_enable_unsupported_configurations` a `true` para evitar que falle el instalador.
+
+
+
+==== Empezar
+
+El servicio de registro puede, opcionalmente, implementarse tanto para las aplicaciones como para las operaciones centrales del propio clúster de OpenShift.  Si elige implementar el registro de operaciones, especifique la variable `openshift_logging_use_ops` como `true` Se crearán dos instancias del servicio.  Las variables que controlan la instancia de registro para operaciones contienen "ops" en ellas, mientras que la instancia para aplicaciones no.
+
+Configurar las variables de Ansible según el método de despliegue es importante para garantizar que los servicios subyacentes utilicen el almacenamiento correcto.  Analicemos las opciones para cada uno de los métodos de implementación.
+
+
+NOTE: Las tablas que aparecen a continuación contienen únicamente las variables relevantes para la configuración del almacenamiento en lo que respecta al servicio de registro.  Puedes encontrar otras opciones enlink:https://docs.openshift.com/container-platform/3.11/install_config/aggregate_logging.html["Documentación de registro de Red Hat OpenShift"^] que deberá revisarse, configurarse y utilizarse de acuerdo con su implementación.
+
+Las variables de la tabla siguiente harán que el playbook de Ansible cree un PV y un PVC para el servicio de registro utilizando los detalles proporcionados.  Este método es significativamente menos flexible que usar el playbook de instalación de componentes después de la instalación de OpenShift; sin embargo, si dispone de volúmenes existentes, es una opción.
+
+[cols="40,40"]
+|===
+| Variable | Detalles 
+
+
+| `openshift_logging_storage_kind` | Empezar a `nfs` para que el instalador cree un PV NFS para el servicio de registro. 
+
+
+| `openshift_logging_storage_host` | El nombre de host o la dirección IP del host NFS.  Esto debe configurarse con el dataLIF de su máquina virtual. 
+
+
+| `openshift_logging_storage_nfs_directory` | La ruta de montaje para la exportación NFS.  Por ejemplo, si el volumen está unido como `/openshift_logging` , usarías esa ruta para esta variable. 
+
+
+| `openshift_logging_storage_volume_name` | El nombre, por ejemplo `pv_ose_logs` , del PV para crear. 
+
+
+| `openshift_logging_storage_volume_size` | El tamaño de la exportación NFS, por ejemplo `100Gi` . 
+|===
+Si su clúster de OpenShift ya está en funcionamiento y, por lo tanto, Trident se ha implementado y configurado, el instalador puede utilizar el aprovisionamiento dinámico para crear los volúmenes.  Será necesario configurar las siguientes variables.
+
+[cols="40,40"]
+|===
+| Variable | Detalles 
+
+
+| `openshift_logging_es_pvc_dynamic` | Establézcalo en verdadero para usar volúmenes aprovisionados dinámicamente. 
+
+
+| `openshift_logging_es_pvc_storage_class_name` | El nombre de la clase de almacenamiento que se utilizará en el PVC. 
+
+
+| `openshift_logging_es_pvc_size` | El tamaño del volumen solicitado en el PVC. 
+
+
+| `openshift_logging_es_pvc_prefix` | Un prefijo para los PVC utilizados por el servicio de registro. 
+
+
+| `openshift_logging_es_ops_pvc_dynamic` | Empezar a `true` utilizar volúmenes aprovisionados dinámicamente para la instancia de registro de operaciones. 
+
+
+| `openshift_logging_es_ops_pvc_storage_class_name` | El nombre de la clase de almacenamiento para la instancia de registro de operaciones. 
+
+
+| `openshift_logging_es_ops_pvc_size` | El tamaño de la solicitud de volumen para la instancia de operaciones. 
+
+
+| `openshift_logging_es_ops_pvc_prefix` | Un prefijo para los PVC de la instancia ops. 
+|===
+
+
+==== Implementar la pila de registro
+
+Si va a implementar el registro como parte del proceso de instalación inicial de OpenShift, solo necesita seguir el proceso de implementación estándar.  Ansible configurará e implementará los servicios y objetos de OpenShift necesarios para que el servicio esté disponible tan pronto como Ansible finalice.
+
+Sin embargo, si realiza la implementación después de la instalación inicial, Ansible deberá utilizar el playbook del componente.  Este proceso puede variar ligeramente con diferentes versiones de OpenShift, así que asegúrese de leer y seguir las instrucciones.link:https://docs.openshift.com/container-platform/3.11/welcome/index.html["Documentación de Red Hat OpenShift Container Platform 3.11"^] para tu versión.
+
+
+
+== Servicio de métricas
+
+El servicio de métricas proporciona información valiosa al administrador sobre el estado, la utilización de recursos y la disponibilidad del clúster de OpenShift.  También es necesario para la funcionalidad de escalado automático de pods y muchas organizaciones utilizan datos del servicio de métricas para sus aplicaciones de facturación interna y/o de visualización de datos.
+
+Al igual que con el servicio de registro y con OpenShift en su conjunto, Ansible se utiliza para implementar el servicio de métricas.  Asimismo, al igual que el servicio de registro, el servicio de métricas se puede implementar durante la configuración inicial del clúster o después de que esté operativo utilizando el método de instalación de componentes.  Las siguientes tablas contienen las variables importantes a la hora de configurar el almacenamiento persistente para el servicio de métricas.
+
+
+NOTE: Las tablas que aparecen a continuación solo contienen las variables relevantes para la configuración del almacenamiento en lo que respecta al servicio de métricas.  En la documentación se incluyen muchas otras opciones que deben revisarse, configurarse y utilizarse de acuerdo con su implementación.
+
+[cols="40,40"]
+|===
+| Variable | Detalles 
+
+
+| `openshift_metrics_storage_kind` | Empezar a `nfs` para que el instalador cree un PV NFS para el servicio de registro. 
+
+
+| `openshift_metrics_storage_host` | El nombre de host o la dirección IP del host NFS.  Esto debe configurarse con el dataLIF de su SVM. 
+
+
+| `openshift_metrics_storage_nfs_directory` | La ruta de montaje para la exportación NFS.  Por ejemplo, si el volumen está unido como `/openshift_metrics` , usarías esa ruta para esta variable. 
+
+
+| `openshift_metrics_storage_volume_name` | El nombre, por ejemplo `pv_ose_metrics` , del PV para crear. 
+
+
+| `openshift_metrics_storage_volume_size` | El tamaño de la exportación NFS, por ejemplo `100Gi` . 
+|===
+Si su clúster de OpenShift ya está en funcionamiento y, por lo tanto, Trident se ha implementado y configurado, el instalador puede utilizar el aprovisionamiento dinámico para crear los volúmenes.  Será necesario configurar las siguientes variables.
+
+[cols="40,40"]
+|===
+| Variable | Detalles 
+
+
+| `openshift_metrics_cassandra_pvc_prefix` | Un prefijo para usar en los PVC métricos. 
+
+
+| `openshift_metrics_cassandra_pvc_size` | El tamaño de los volúmenes a solicitar. 
+
+
+| `openshift_metrics_cassandra_storage_type` | El tipo de almacenamiento que se utilizará para las métricas debe configurarse como dinámico para que Ansible cree PVC con la clase de almacenamiento adecuada. 
+
+
+| `openshift_metrics_cassanda_pvc_storage_class_name` | El nombre de la clase de almacenamiento que se va a utilizar. 
+|===
+
+
+=== Implementar el servicio de métricas
+
+Con las variables de Ansible apropiadas definidas en su archivo hosts/inventory, implemente el servicio utilizando Ansible.  Si realiza la implementación durante la instalación de OpenShift, el PV se creará y utilizará automáticamente.  Si realiza la implementación utilizando los playbooks de componentes, después de la instalación de OpenShift, Ansible crea los PVC necesarios y, después de que Trident haya aprovisionado el almacenamiento para ellos, implementa el servicio.
+
+Las variables anteriores, así como el proceso de implementación, pueden cambiar con cada versión de OpenShift.  Asegúrese de revisar y seguirlink:https://docs.openshift.com/container-platform/3.11/install_config/cluster_metrics.html["Guía de implementación de OpenShift de Red Hat"^] para su versión, de modo que esté configurada para su entorno.

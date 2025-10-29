@@ -1,0 +1,138 @@
+---
+sidebar: sidebar 
+permalink: trident-protect/trident-protect-restore-settings.html 
+keywords: trident, protect, restore, data, backup 
+summary: Puede personalizar las operaciones de restauración de protección de Trident mediante anotaciones, configuraciones de espacios de nombres y opciones de almacenamiento. 
+---
+= Utilice la configuración avanzada de restauración de protección de Trident
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ../media/
+
+
+[role="lead"]
+Puede personalizar las operaciones de restauración utilizando configuraciones avanzadas, como anotaciones, configuraciones de espacios de nombres y opciones de almacenamiento para satisfacer sus requisitos específicos.
+
+
+
+== Anotaciones y etiquetas de espacio de nombres durante las operaciones de restauración y conmutación por error
+
+Durante las operaciones de restauración y conmutación por error, las etiquetas y anotaciones del espacio de nombres de destino se ajustan para que coincidan con las etiquetas y anotaciones del espacio de nombres de origen.  Las etiquetas o anotaciones del espacio de nombres de origen que no existen en el espacio de nombres de destino se agregan, y las etiquetas o anotaciones que ya existen se sobrescriben para que coincidan con el valor del espacio de nombres de origen.  Las etiquetas o anotaciones que existen únicamente en el espacio de nombres de destino permanecen sin cambios.
+
+
+NOTE: Si utiliza Red Hat OpenShift, es importante tener en cuenta el papel fundamental que desempeñan las anotaciones de espacios de nombres en los entornos OpenShift. Las anotaciones de espacio de nombres garantizan que los pods restaurados cumplan con los permisos y las configuraciones de seguridad adecuados definidos por las restricciones de contexto de seguridad (SCC) de OpenShift y puedan acceder a los volúmenes sin problemas de permisos. Para obtener más información, consulte la https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/authentication_and_authorization/managing-pod-security-policies["Documentación sobre las restricciones del contexto de seguridad de OpenShift"^] .
+
+Puedes evitar que se sobrescriban anotaciones específicas en el espacio de nombres de destino configurando la variable de entorno de Kubernetes. `RESTORE_SKIP_NAMESPACE_ANNOTATIONS` antes de realizar la operación de restauración o conmutación por error. Por ejemplo:
+
+[source, console]
+----
+helm upgrade trident-protect --set restoreSkipNamespaceAnnotations=<annotation_key_to_skip_1>,<annotation_key_to_skip_2> --reuse-values
+----
+
+NOTE: Al realizar una operación de restauración o conmutación por error, se tendrán en cuenta las anotaciones y etiquetas de espacio de nombres especificadas en `restoreSkipNamespaceAnnotations` y `restoreSkipNamespaceLabels` quedan excluidos de la operación de restauración o conmutación por error. Asegúrese de que estos ajustes se configuren durante la instalación inicial de Helm. Para obtener más información, consulte link:../trident-protect/trident-protect-customize-installation.html#configure-autoSupport-and-namespace-filtering-options["Configurar las opciones de filtrado de espacios de nombres y AutoSupport"].
+
+Si instalaste la aplicación de origen usando Helm con el `--create-namespace` bandera, se le da un trato especial a la `name` Clave de etiqueta.  Durante el proceso de restauración o conmutación por error, Trident Protect copia esta etiqueta al espacio de nombres de destino, pero actualiza el valor al valor del espacio de nombres de destino si el valor de origen coincide con el espacio de nombres de origen.  Si este valor no coincide con el espacio de nombres de origen, se copia al espacio de nombres de destino sin cambios.
+
+
+
+=== Ejemplo
+
+El siguiente ejemplo presenta un espacio de nombres de origen y destino, cada uno con diferentes anotaciones y etiquetas.  Puedes ver el estado del espacio de nombres de destino antes y después de la operación, y cómo se combinan o sobrescriben las anotaciones y etiquetas en el espacio de nombres de destino.
+
+
+
+==== Antes de la operación de restauración o conmutación por error
+
+La siguiente tabla ilustra el estado de los espacios de nombres de origen y destino de ejemplo antes de la operación de restauración o conmutación por error:
+
+[cols="1,2a,2a"]
+|===
+| Espacio de nombres | Anotaciones | Etiquetas 
+
+
+| Espacio de nombres ns-1 (fuente)  a| 
+* annotation.one/key: "valor actualizado"
+* annotation.two/key: "true"
+
+ a| 
+* entorno=producción
+* cumplimiento=HIPAA
+* nombre=ns-1
+
+
+
+
+| Espacio de nombres ns-2 (destino)  a| 
+* annotation.one/key: "true"
+* anotación.tres/clave: "falso"
+
+ a| 
+* rol=base de datos
+
+
+|===
+
+
+==== Después de la operación de restauración
+
+La siguiente tabla ilustra el estado del espacio de nombres de destino de ejemplo después de la operación de restauración o conmutación por error.  Se han añadido algunas claves, se han sobrescrito otras y la `name` La etiqueta se ha actualizado para que coincida con el espacio de nombres de destino:
+
+[cols="1,2a,2a"]
+|===
+| Espacio de nombres | Anotaciones | Etiquetas 
+
+
+| Espacio de nombres ns-2 (destino)  a| 
+* annotation.one/key: "valor actualizado"
+* annotation.two/key: "true"
+* anotación.tres/clave: "falso"
+
+ a| 
+* nombre=ns-2
+* cumplimiento=HIPAA
+* entorno=producción
+* rol=base de datos
+
+
+|===
+
+
+== Campos admitidos
+
+Esta sección describe campos adicionales disponibles para operaciones de restauración.
+
+
+
+=== Mapeo de clases de almacenamiento
+
+El `spec.storageClassMapping` El atributo define una asignación desde una clase de almacenamiento presente en la aplicación de origen a una nueva clase de almacenamiento en el clúster de destino. Puede usar esto al migrar aplicaciones entre clústeres con diferentes clases de almacenamiento o al cambiar el backend de almacenamiento para operaciones de BackupRestore.
+
+*Ejemplo:*
+
+[source, yaml]
+----
+storageClassMapping:
+  - destination: "destinationStorageClass1"
+    source: "sourceStorageClass1"
+  - destination: "destinationStorageClass2"
+    source: "sourceStorageClass2"
+----
+
+
+== Anotaciones admitidas
+
+Esta sección enumera las anotaciones admitidas para configurar diversos comportamientos en el sistema.  Si el usuario no establece explícitamente una anotación, el sistema utilizará el valor predeterminado.
+
+[cols="1,1,3,1"]
+|===
+| Anotación | Tipo | Descripción | Valor predeterminado 
+
+
+| protect.trident.netapp.io/data-mover-timeout-sec | cadena | Tiempo máximo (en segundos) permitido para que se detenga la operación de transferencia de datos. | "300" 
+
+
+| protect.trident.netapp.io/kopia-content-cache-size-limit-mb | cadena | El límite de tamaño máximo (en megabytes) para la caché de contenido de Kopia. | "1000" 
+|===

@@ -1,0 +1,55 @@
+---
+sidebar: sidebar 
+permalink: trident-reference/trident-cl.html 
+keywords: command-line, options, logging, kubernetes, docker, ports 
+summary: Trident expone varias opciones de línea de comandos para el orquestador Trident y se comunica a través de ciertos puertos. 
+---
+= Opciones de línea de comandos
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+[role="lead"]
+Trident expone varias opciones de línea de comandos para el orquestador Trident .  Puedes utilizar estas opciones para modificar tu implementación.
+
+
+
+== Explotación florestal
+
+`-debug`:: Habilita la salida de depuración.
+`-loglevel <level>`:: Establece el nivel de registro (depuración, información, advertencia, error, fatal).  Valor predeterminado: información.
+
+
+
+
+== Kubernetes
+
+`-k8s_pod`:: Utilice esta opción o `-k8s_api_server` para habilitar la compatibilidad con Kubernetes.  Al configurar esto, Trident utilizará las credenciales de la cuenta de servicio de Kubernetes del pod que lo contiene para contactar con el servidor de la API.  Esto solo funciona cuando Trident se ejecuta como un pod en un clúster de Kubernetes con cuentas de servicio habilitadas.
+`-k8s_api_server <insecure-address:insecure-port>`:: Utilice esta opción o `-k8s_pod` para habilitar la compatibilidad con Kubernetes.  Cuando se especifica, Trident se conecta al servidor de la API de Kubernetes utilizando la dirección y el puerto no seguros proporcionados.  Esto permite que Trident se implemente fuera de un pod; sin embargo, solo admite conexiones no seguras al servidor de la API.  Para conectarse de forma segura, implemente Trident en un pod con el `-k8s_pod` opción.
+
+
+
+
+== Docker
+
+`-volume_driver <name>`:: Nombre del controlador utilizado al registrar el complemento de Docker.  Valor predeterminado `netapp` .
+`-driver_port <port-number>`:: Escuche en este puerto en lugar de en un socket de dominio UNIX.
+`-config <file>`:: Obligatorio; debe especificar esta ruta a un archivo de configuración del backend.
+
+
+
+
+== DESCANSAR
+
+`-address <ip-or-host>`:: Especifica la dirección en la que debe escuchar el servidor REST de Trident.  Por defecto, se utiliza localhost.  Al escuchar en localhost y ejecutarse dentro de un pod de Kubernetes, la interfaz REST no es directamente accesible desde fuera del pod.  Usar `-address ""` para que la interfaz REST sea accesible desde la dirección IP del pod.
++
+--
+
+CAUTION: La interfaz REST de Trident se puede configurar para escuchar y servir solo en 127.0.0.1 (para IPv4) o [::1] (para IPv6).
+
+--
+`-port <port-number>`:: Especifica el puerto en el que debe escuchar el servidor REST de Trident.  Valor predeterminado: 8000.
+`-rest`:: Habilita la interfaz REST.  Valor predeterminado: verdadero.
+
