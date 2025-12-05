@@ -21,7 +21,7 @@ WARNING: El `tridentctl` El binario para Linux que se proporciona en el archivo 
 
 == Novedades de la versión 25.06.2
 
-El resumen de novedades proporciona detalles sobre las mejoras, correcciones y funciones obsoletas tanto para las versiones de Trident como para las de Trident Protect.
+El resumen de novedades proporciona detalles sobre mejoras, correcciones y desuso de las versiones Trident y Trident Protect.
 
 
 
@@ -137,7 +137,7 @@ NOTE: Esta función es experimental y actualmente admite flujos de trabajo paral
 
 
 
-=== Protección Trident
+=== Trident Protect
 
 NetApp Trident Protect proporciona capacidades avanzadas de gestión de datos de aplicaciones que mejoran la funcionalidad y la disponibilidad de las aplicaciones Kubernetes con estado respaldadas por los sistemas de almacenamiento NetApp ONTAP y el aprovisionador de almacenamiento NetApp Trident CSI.
 
@@ -190,7 +190,7 @@ NetApp Trident Protect proporciona capacidades avanzadas de gestión de datos de
 
 == Cambios en 25.02
 
-A partir de Trident 25.02, el resumen de Novedades proporciona detalles sobre mejoras, correcciones y obsolescencias tanto para las versiones de Trident como para las de Trident Protect.
+A partir de Trident 25.02, el resumen de novedades proporciona detalles sobre mejoras, correcciones y desuso de las versiones Trident y Trident Protect.
 
 
 
@@ -243,7 +243,7 @@ A partir de Trident 25.02, el resumen de Novedades proporciona detalles sobre me
 
 
 
-=== Protección Trident
+=== Trident Protect
 
 NetApp Trident Protect proporciona capacidades avanzadas de gestión de datos de aplicaciones que mejoran la funcionalidad y la disponibilidad de las aplicaciones Kubernetes con estado respaldadas por los sistemas de almacenamiento NetApp ONTAP y el aprovisionador de almacenamiento NetApp Trident CSI.
 
@@ -251,13 +251,13 @@ NetApp Trident Protect proporciona capacidades avanzadas de gestión de datos de
 
 ==== Mejoras
 
-* Se ha añadido compatibilidad con copias de seguridad y restauración para máquinas virtuales de virtualización KubeVirt / OpenShift tanto para almacenamiento volumeMode: File como volumeMode: Block (dispositivo sin formato).  Esta compatibilidad es compatible con todos los controladores Trident y mejora las funciones de protección existentes al replicar el almacenamiento mediante NetApp SnapMirror con Trident Protect.
+* Se ha añadido compatibilidad con copias de seguridad y restauración para máquinas virtuales de virtualización KubeVirt / OpenShift tanto para almacenamiento volumeMode: File como volumeMode: Block (dispositivo sin formato). Este soporte es compatible con todos los controladores Trident y mejora las funciones de protección existentes al replicar almacenamiento utilizando NetApp SnapMirror con Trident Protect.
 * Se ha añadido la capacidad de controlar el comportamiento de congelación a nivel de aplicación para entornos Kubevirt.
 * Se ha añadido compatibilidad para configurar las conexiones proxy de AutoSupport .
 * Se agregó la capacidad de definir un secreto para el cifrado del movimiento de datos (Kopia / Restic).
 * Se ha añadido la capacidad de ejecutar manualmente un gancho de ejecución.
 * Se agregó la capacidad de configurar restricciones de contexto de seguridad (SCC) durante la instalación de Trident Protect.
-* Se ha añadido compatibilidad para configurar nodeSelector durante la instalación de Trident Protect.
+* Se agregó soporte para configurar nodeSelector durante la instalación de Trident Protect.
 * Se ha añadido compatibilidad con proxy de salida HTTP/HTTPS para objetos de AppVault.
 * Se ha extendido el filtro de recursos para permitir la exclusión de recursos con ámbito de clúster.
 * Se ha añadido compatibilidad con el token de sesión de AWS en las credenciales de S3 AppVault.
@@ -327,7 +327,7 @@ NetApp Trident Protect proporciona capacidades avanzadas de gestión de datos de
 ** Recuperación ante desastres
 ** Movilidad de la aplicación
 +
-link:./trident-protect/learn-about-trident-protect.html["Obtén más información sobre Trident Protect."].
+link:./trident-protect/learn-about-trident-protect.html["Obtenga más información sobre Trident Protect"].
 
 
 

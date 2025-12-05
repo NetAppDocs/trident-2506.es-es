@@ -4,7 +4,7 @@ permalink: trident-protect/trident-protect-protect-apps.html
 keywords: protect, snapshots, demand, configuration, cluster, appvault 
 summary: Proteja todas las aplicaciones tomando instantáneas y copias de seguridad utilizando una política de protección automatizada o de forma puntual. 
 ---
-= Proteja sus aplicaciones con Trident Protect.
+= Proteja las aplicaciones con Trident Protect
 :hardbreaks:
 :allow-uri-read: 
 :nofooter: 
@@ -14,10 +14,10 @@ summary: Proteja todas las aplicaciones tomando instantáneas y copias de seguri
 
 
 [role="lead"]
-Puedes proteger todas las aplicaciones gestionadas por Trident Protect tomando instantáneas y copias de seguridad utilizando una política de protección automatizada o de forma puntual.
+Puede proteger todas las aplicaciones administradas por Trident Protect tomando instantáneas y copias de seguridad mediante una política de protección automatizada o de forma ad hoc.
 
 
-NOTE: Puede configurar Trident Protect para congelar y descongelar sistemas de archivos durante las operaciones de protección de datos. link:trident-protect-requirements.html#protecting-data-with-kubevirt-vms["Obtenga más información sobre cómo configurar la congelación del sistema de archivos con Trident Protect."].
+NOTE: Puede configurar Trident Protect para congelar y descongelar sistemas de archivos durante operaciones de protección de datos. link:trident-protect-requirements.html#protecting-data-with-kubevirt-vms["Obtenga más información sobre cómo configurar la congelación del sistema de archivos con Trident Protect"].
 
 
 
@@ -347,13 +347,13 @@ kubectl get backup -n <namespace_name> <my_backup_cr_name> -o jsonpath='{.status
 
 == Habilitar la copia de seguridad y la restauración para las operaciones de archivos de Azure NetApp (ANF).
 
-Si ha instalado Trident Protect, puede habilitar la funcionalidad de copia de seguridad y restauración con uso eficiente del espacio para los backends de almacenamiento que utilizan la clase de almacenamiento azure-netapp-files y que se crearon antes de Trident 24.06.  Esta funcionalidad funciona con volúmenes NFSv4 y no consume espacio adicional del grupo de capacidad.
+Si ha instalado Trident Protect, puede habilitar la funcionalidad de copia de seguridad y restauración que ahorra espacio para los backends de almacenamiento que usan la clase de almacenamiento azure-netapp-files y se crearon antes de Trident 24.06. Esta funcionalidad funciona con volúmenes NFSv4 y no consume espacio adicional del grupo de capacidad.
 
 .Antes de empezar
 Asegúrese de lo siguiente:
 
-* Has instalado Trident Protect.
-* Has definido una aplicación en Trident Protect.  Esta aplicación tendrá una funcionalidad de protección limitada hasta que complete este procedimiento.
+* Ha instalado Trident Protect.
+* Ha definido una aplicación en Trident Protect. Esta aplicación tendrá una funcionalidad de protección limitada hasta que complete este procedimiento.
 * Tienes `azure-netapp-files` seleccionada como la clase de almacenamiento predeterminada para su backend de almacenamiento.
 
 
@@ -383,13 +383,13 @@ Respuesta:
 snapshotDirectory: "true"
 ----
 +
-Cuando el directorio de instantáneas no está habilitado, Trident Protect elige la funcionalidad de copia de seguridad regular, que consume temporalmente espacio en el grupo de capacidad durante el proceso de copia de seguridad.  En este caso, asegúrese de que haya suficiente espacio disponible en el grupo de capacidad para crear un volumen temporal del tamaño del volumen del que se está realizando la copia de seguridad.
+Cuando el directorio de instantáneas no está habilitado, se elige la funcionalidad de copia de seguridad regular, que consume temporalmente espacio en el grupo de capacidad durante el proceso de copia de seguridad. En este caso, asegúrese de que haya suficiente espacio disponible en el grupo de capacidad para crear un volumen temporal del tamaño del volumen del que se está realizando la copia de seguridad.
 
 
 
 
 
 .Resultado
-La aplicación está lista para realizar copias de seguridad y restauración utilizando Trident Protect.  Cada PVC también está disponible para ser utilizado por otras aplicaciones para copias de seguridad y restauraciones.
+La aplicación está lista para realizar copias de seguridad y restaurar mediante Trident Protect. Cada PVC también está disponible para ser utilizado por otras aplicaciones para copias de seguridad y restauraciones.
 
 ====

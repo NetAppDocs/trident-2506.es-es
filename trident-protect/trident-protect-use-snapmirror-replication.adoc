@@ -2,9 +2,9 @@
 sidebar: sidebar 
 permalink: trident-protect/trident-protect-use-snapmirror-replication.html 
 keywords: trident, protect, netapp, snapmirror, data, asynchronous, replication, clusters 
-summary: Con Trident Protect, puede utilizar las capacidades de replicación asíncrona de la tecnología NetApp SnapMirror para replicar datos y cambios de aplicaciones de un backend de almacenamiento a otro, en el mismo clúster o entre clústeres diferentes. 
+summary: Con Trident Protect, puede utilizar las capacidades de replicación asincrónica de la tecnología SnapMirror de NetApp para replicar cambios de datos y aplicaciones de un backend de almacenamiento a otro, en el mismo clúster o entre diferentes clústeres. 
 ---
-= Replicar aplicaciones usando NetApp SnapMirror y Trident Protect
+= Replicar aplicaciones utilizando NetApp SnapMirror y Trident Protect
 :hardbreaks:
 :allow-uri-read: 
 :nofooter: 
@@ -14,7 +14,7 @@ summary: Con Trident Protect, puede utilizar las capacidades de replicación as�
 
 
 [role="lead"]
-Con Trident Protect, puede utilizar las capacidades de replicación asíncrona de la tecnología NetApp SnapMirror para replicar datos y cambios de aplicaciones de un backend de almacenamiento a otro, en el mismo clúster o entre clústeres diferentes.
+Con Trident Protect, puede utilizar las capacidades de replicación asincrónica de la tecnología SnapMirror de NetApp para replicar cambios de datos y aplicaciones de un backend de almacenamiento a otro, en el mismo clúster o entre diferentes clústeres.
 
 
 
@@ -34,7 +34,7 @@ helm upgrade trident-protect --set restoreSkipNamespaceAnnotations=<annotation_k
 
 NOTE: Al realizar una operación de restauración o conmutación por error, se tendrán en cuenta las anotaciones y etiquetas de espacio de nombres especificadas en `restoreSkipNamespaceAnnotations` y `restoreSkipNamespaceLabels` quedan excluidos de la operación de restauración o conmutación por error. Asegúrese de que estos ajustes se configuren durante la instalación inicial de Helm. Para obtener más información, consulte link:../trident-protect/trident-protect-customize-installation.html#configure-autoSupport-and-namespace-filtering-options["Configurar las opciones de filtrado de espacios de nombres y AutoSupport"].
 
-Si instalaste la aplicación de origen usando Helm con el `--create-namespace` bandera, se le da un trato especial a la `name` Clave de etiqueta.  Durante el proceso de restauración o conmutación por error, Trident Protect copia esta etiqueta al espacio de nombres de destino, pero actualiza el valor al valor del espacio de nombres de destino si el valor de origen coincide con el espacio de nombres de origen.  Si este valor no coincide con el espacio de nombres de origen, se copia al espacio de nombres de destino sin cambios.
+Si instalaste la aplicación de origen usando Helm con el `--create-namespace` bandera, se le da un trato especial a la `name` Clave de etiqueta. Durante el proceso de restauración o conmutación por error, Trident Protect copia esta etiqueta en el espacio de nombres de destino, pero actualiza el valor al valor del espacio de nombres de destino si el valor del origen coincide con el espacio de nombres de origen. Si este valor no coincide con el espacio de nombres de origen, se copia al espacio de nombres de destino sin cambios.
 
 
 
@@ -99,7 +99,7 @@ La siguiente tabla ilustra el estado del espacio de nombres de destino de ejempl
 
 |===
 
-NOTE: Puede configurar Trident Protect para congelar y descongelar sistemas de archivos durante las operaciones de protección de datos. link:trident-protect-requirements.html#protecting-data-with-kubevirt-vms["Obtenga más información sobre cómo configurar la congelación del sistema de archivos con Trident Protect."].
+NOTE: Puede configurar Trident Protect para congelar y descongelar sistemas de archivos durante operaciones de protección de datos. link:trident-protect-requirements.html#protecting-data-with-kubevirt-vms["Obtenga más información sobre cómo configurar la congelación del sistema de archivos con Trident Protect"].
 
 
 
@@ -111,7 +111,7 @@ Al utilizar la relación AppMirror para proteger su aplicación, existen comport
 * Durante la resincronización inversa o inversa, se eliminan todos los ganchos de ejecución existentes en la aplicación.  Cuando la aplicación de origen se convierte en la aplicación de destino, estos ganchos de ejecución dejan de ser válidos y se eliminan para evitar su ejecución.
 
 
-Para obtener más información sobre los ganchos de ejecución, consultelink:../trident-protect/trident-protect-use-execution-hooks.html["Gestionar los ganchos de ejecución de Trident Protect"] .
+Para obtener más información sobre los ganchos de ejecución, consultelink:../trident-protect/trident-protect-use-execution-hooks.html["Administrar los ganchos de ejecución de Trident Protect"] .
 
 
 
@@ -119,7 +119,7 @@ Para obtener más información sobre los ganchos de ejecución, consultelink:../
 
 Establecer una relación de replicación implica lo siguiente:
 
-* Elegir la frecuencia con la que desea que Trident Protect tome una instantánea de la aplicación (que incluye los recursos de Kubernetes de la aplicación, así como las instantáneas de volumen para cada uno de los volúmenes de la aplicación).
+* Elegir la frecuencia con la que desea que Trident Protect tome una instantánea de la aplicación (que incluye los recursos de Kubernetes de la aplicación, así como las instantáneas de volumen para cada uno de los volúmenes de la aplicación)
 * Elegir el plan de replicación (incluye recursos de Kubernetes y datos de volúmenes persistentes).
 * Configurar la hora para tomar la instantánea
 
@@ -448,7 +448,7 @@ kubectl get amr -n my-app-namespace <relationship name> -o=jsonpath='{.status}' 
 
 === Conmutación por error al clúster de destino
 
-Con Trident Protect, puede realizar la conmutación por error de aplicaciones replicadas a un clúster de destino.  Este procedimiento detiene la relación de replicación y pone la aplicación en línea en el clúster de destino.  Trident Protect no detiene la aplicación en el clúster de origen si estaba operativa.
+Con Trident Protect, puede conmutar por error las aplicaciones replicadas a un clúster de destino. Este procedimiento detiene la relación de replicación y pone la aplicación en línea en el clúster de destino. Trident Protect no detiene la aplicación en el clúster de origen si estaba operativa.
 
 .Pasos
 . En el clúster de destino, edite el archivo CR AppMirrorRelationship (por ejemplo, `trident-protect-relationship.yaml` ) y cambiar el valor de *spec.desiredState* a `Promoted` .
@@ -509,7 +509,7 @@ Cuando se resincroniza de forma inversa una relación de replicación por conmut
 
 == Dirección de replicación de la aplicación inversa
 
-Cuando se invierte la dirección de replicación, Trident Protect mueve la aplicación al backend de almacenamiento de destino mientras continúa replicándola de vuelta al backend de almacenamiento de origen original.  Trident Protect detiene la aplicación de origen y replica los datos en el destino antes de realizar la conmutación por error a la aplicación de destino.
+Cuando invierte la dirección de replicación, Trident Protect mueve la aplicación al backend de almacenamiento de destino mientras continúa replicando al backend de almacenamiento de origen original. Trident Protect detiene la aplicación de origen y replica los datos en el destino antes de conmutar por error a la aplicación de destino.
 
 En esta situación, estás intercambiando el origen y el destino.
 
@@ -609,7 +609,7 @@ Las siguientes acciones se producen debido a la replicación inversa:
 
 === Revertir las aplicaciones al clúster de origen original
 
-Utilizando Trident Protect, puede lograr la "recuperación tras fallo" después de una operación de conmutación por error mediante la siguiente secuencia de operaciones.  En este flujo de trabajo para restaurar la dirección de replicación original, Trident Protect replica (resincroniza) cualquier cambio de la aplicación de vuelta a la aplicación de origen original antes de invertir la dirección de replicación.
+Al utilizar Trident Protect, puede lograr una "conmutación por error" después de una operación de conmutación por error mediante la siguiente secuencia de operaciones. En este flujo de trabajo para restaurar la dirección de replicación original, Trident Protect replica (resincroniza) cualquier cambio de aplicación a la aplicación de origen original antes de revertir la dirección de replicación.
 
 Este proceso comienza a partir de una relación que ha completado una conmutación por error a un destino e implica los siguientes pasos:
 

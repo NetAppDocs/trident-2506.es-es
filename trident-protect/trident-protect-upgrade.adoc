@@ -2,9 +2,9 @@
 sidebar: sidebar 
 permalink: trident-protect/trident-protect-upgrade.html 
 keywords: trident, protect, netapp, upgrade, new, version 
-summary: Puedes actualizar Trident Protect a la última versión para aprovechar las nuevas funciones o las correcciones de errores. 
+summary: Puede actualizar Trident Protect a la última versión para aprovechar nuevas funciones o correcciones de errores. 
 ---
-= Mejora la protección del Trident
+= Actualizar Trident Protect
 :hardbreaks:
 :allow-uri-read: 
 :nofooter: 
@@ -14,7 +14,7 @@ summary: Puedes actualizar Trident Protect a la última versión para aprovechar
 
 
 [role="lead"]
-Puedes actualizar Trident Protect a la última versión para aprovechar las nuevas funciones o las correcciones de errores.
+Puede actualizar Trident Protect a la última versión para aprovechar nuevas funciones o correcciones de errores.
 
 [NOTE]
 ====
@@ -23,7 +23,7 @@ Al actualizar desde la versión 24.10, es posible que fallen las instantáneas q
 Para evitar posibles fallos, puede deshabilitar todas las programaciones de instantáneas antes de la actualización y volver a habilitarlas después.  Sin embargo, esto provoca que se pierdan las instantáneas programadas durante el período de actualización.
 
 ====
-Para actualizar Trident Protect, siga los siguientes pasos.
+Para actualizar Trident Protect, realice los siguientes pasos.
 
 .Pasos
 . Actualizar el repositorio de Trident Helm:
@@ -32,10 +32,10 @@ Para actualizar Trident Protect, siga los siguientes pasos.
 ----
 helm repo update
 ----
-. Actualizar los CRD de protección Trident :
+. Actualice los CRD Trident Protect:
 +
 
-NOTE: Este paso es necesario si está actualizando desde una versión anterior a la 25.06, ya que los CRD ahora están incluidos en el gráfico de Trident protect Helm.
+NOTE: Este paso es necesario si estás actualizando desde una versión anterior a la 25.06, ya que los CRD ahora están incluidos en la tabla de Trident Protect Helm.
 
 +
 .. Ejecute este comando para transferir la administración de CRD desde `trident-protect-crds` a `trident-protect` :
@@ -56,7 +56,7 @@ kubectl delete secret -n trident-protect -l name=trident-protect-crds,owner=helm
 ----
 
 
-. Mejora la protección del Trident :
+. Mejora Trident Protect:
 +
 [source, console]
 ----
