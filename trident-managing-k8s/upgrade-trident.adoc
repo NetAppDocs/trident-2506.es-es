@@ -39,7 +39,7 @@ Al actualizar a la última versión de Trident, tenga en cuenta lo siguiente:
 Las versiones de Trident siguen una fecha. `YY.MM` Convención de nomenclatura, donde "YY" son los dos últimos dígitos del año y "MM" es el mes.  Los lanzamientos de Dot siguen a `YY.MM.X` convención, donde "X" es el nivel de parche.  Seleccionarás la versión a la que deseas actualizar en función de la versión desde la que estás actualizando.
 
 * Puede realizar una actualización directa a cualquier versión objetivo que se encuentre dentro de un rango de cuatro versiones con respecto a su versión instalada.  Por ejemplo, puede actualizar directamente desde la versión 24.06 (o cualquier versión derivada de la 24.06) a la versión 25.06.
-* Si está actualizando desde una versión que no se encuentra dentro del período de cuatro versiones, realice una actualización en varios pasos.  Utilice las instrucciones de actualización paralink:../earlier-versions.html["versión anterior"] Estás actualizando a la versión más reciente que se ajusta al período de cuatro versiones.  Por ejemplo, si está utilizando la versión 23.07 y desea actualizar a la versión 25.06:
+* Si estás actualizando desde una versión fuera de la ventana de cuatro versiones, realiza una actualización en varios pasos. Usa las instrucciones de actualización de la versión anterior desde la que estás actualizando para actualizar a la versión más reciente que se ajuste a la ventana de cuatro versiones. Por ejemplo, si estás ejecutando 23.07 y quieres actualizar a 25.06:
 +
 .. Primera actualización de la versión 23.07 a la 24.06.
 .. Luego, actualice de la versión 24.06 a la 25.06.

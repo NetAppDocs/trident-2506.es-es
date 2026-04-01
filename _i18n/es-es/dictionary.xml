@@ -98,28 +98,6 @@
   <block id="ccd722b2b8950bc9aa2b92826dcc4664" category="list-text">11 de marzo de 2025:<block ref="751073ae4d07c4adc8a15e872b137421" category="inline-link-macro-rx"></block></block>
   <block id="bc057a27d4d8047073d6f5fa802c9c2b" category="inline-link-macro">Trident 25.02: Mejorando la experiencia de Red Hat OpenShift con nuevas e interesantes funciones</block>
   <block id="fb68b473f5b70bc40e206ef882be4c63" category="list-text">3 de marzo de 2025:<block ref="ce0fc75766d0530b76aaabf87dc1b463" category="inline-link-macro-rx"></block></block>
-  <block id="17c5eeb01739643b5aef94fe18b6c849" category="summary">Puede utilizar el selector de versiones para navegar entre la última versión y las cuatro versiones anteriores o utilizar los enlaces que aparecen a continuación.</block>
-  <block id="ba09ee47d11962c1ccd13d7e1f10e6c5" category="doc">Versiones anteriores de la documentación</block>
-  <block id="472039bf3422ff2697dba6fc9fdd57d8" category="inline-link-macro">ciclo de vida del soporte Trident</block>
-  <block id="a3148578e6ffde89485954832ff9be37" category="paragraph">Si no está utilizando Trident 25.06, la documentación de las versiones anteriores está disponible en función de<block ref="6d47e9235a19453f00cf246917b9e162" category="inline-link-macro-rx"></block> .</block>
-  <block id="a1862e00d8111386cdf238bd23bb97db" category="inline-link">Trident 25.02</block>
-  <block id="25bdd2f6eb0ca7663bf4152396a74a09" category="list-text"><block ref="25bdd2f6eb0ca7663bf4152396a74a09" category="inline-link-rx"></block></block>
-  <block id="41ee1e1e674f49a8e3c78fc5517b1b83" category="inline-link">Trident 24.10</block>
-  <block id="330905133ec61fb32dbdb0593cf466a2" category="list-text"><block ref="330905133ec61fb32dbdb0593cf466a2" category="inline-link-rx"></block></block>
-  <block id="c45d9c1b397ff706a7a39c069930c677" category="inline-link">Trident 24.06</block>
-  <block id="d0fd12656eeec63fe137c83181c17c0b" category="list-text"><block ref="d0fd12656eeec63fe137c83181c17c0b" category="inline-link-rx"></block></block>
-  <block id="45d1e500370372fc7e76e110b5aff92d" category="inline-link">Trident 24.02</block>
-  <block id="b735f50352c31f80267e7a6fc57ce804" category="list-text"><block ref="b735f50352c31f80267e7a6fc57ce804" category="inline-link-rx"></block></block>
-  <block id="b4dfeb42b5c9816777494eeb7a772461" category="inline-link">Trident 23.10</block>
-  <block id="55cad0455da7cf59434d9f8ff225c39b" category="list-text"><block ref="55cad0455da7cf59434d9f8ff225c39b" category="inline-link-rx"></block></block>
-  <block id="8806d0d5f26e8a704b5d26c076c531bd" category="inline-link">Trident 23.07</block>
-  <block id="9c74a4e8266dd7e50d12a159c32d6b10" category="list-text"><block ref="9c74a4e8266dd7e50d12a159c32d6b10" category="inline-link-rx"></block></block>
-  <block id="3a4e6f76b26aa8878f5798aba052777c" category="inline-link">Trident 23.04</block>
-  <block id="5bff8eb1dea519dd15a076031fa9f288" category="list-text"><block ref="5bff8eb1dea519dd15a076031fa9f288" category="inline-link-rx"></block></block>
-  <block id="5382f4fbc3622ef143d9ddbe033351ab" category="inline-link">Trident 23.01</block>
-  <block id="a9425b076f0cf301dc3a2d77e67816ca" category="list-text"><block ref="a9425b076f0cf301dc3a2d77e67816ca" category="inline-link-rx"></block></block>
-  <block id="2e0d64f2a4b164112beaf0506070ad85" category="inline-link">Trident 22.10</block>
-  <block id="e4c5c8d195d27f073639195f80da50a2" category="list-text"><block ref="e4c5c8d195d27f073639195f80da50a2" category="inline-link-rx"></block></block>
   <block id="c48696f9d5a5a881f7f2f08fd40ce424" category="summary">Encuentre respuestas a las preguntas más frecuentes sobre la instalación, configuración, actualización y solución de problemas de Trident.</block>
   <block id="af2a4d2810d86aa0169c117f82682f9a" category="doc">Preguntas frecuentes</block>
   <block id="96ab491ef73d5db0cd15f55e1552cc22" category="section-title">Preguntas generales</block>
@@ -284,7 +262,6 @@
   <block id="c6fc0d89ce850093b5d2e987955ba870" category="list-text">La documentación de Trident está disponible para los meses 25 a 36 a partir de la fecha de lanzamiento.</block>
   <block id="34b6cd75171affba6957e308dcbd92be" category="cell">Versión</block>
   <block id="e26bc895e5bb00237e35bd08e101a228" category="inline-link-macro">25,06</block>
-  <block id="512754259e832a6faaee7e55aa2a0641" category="paragraph"><block ref="512754259e832a6faaee7e55aa2a0641" category="inline-link-macro-rx"></block></block>
   <block id="c21446b3ecfb30ed6c2760d686bd4578" category="cell">junio de 2026</block>
   <block id="2f57a6988da045d1c26e2c5016ad0900" category="cell">junio de 2027</block>
   <block id="e388180fa8946253a28286d92fcbc393" category="cell">junio de 2028</block>
@@ -295,31 +272,24 @@
   <block id="eaaf7bd308bf6f27888c8d18ba11417d" category="cell">febrero de 2028</block>
   <block id="e9c4cf1c3d2fd7e6c0a13bfe44d8e785" category="inline-link-macro">24,10</block>
   <block id="5956c33dbd8c8ed6e363f54092a9d544" category="paragraph"><block ref="5956c33dbd8c8ed6e363f54092a9d544" category="inline-link-macro-rx"></block></block>
-  <block id="99dfa28920a40a7be0858c50f989a3e5" category="cell">octubre de 2025</block>
   <block id="78c875172f37f031a2632dc008815ee1" category="cell">octubre de 2026</block>
   <block id="17ab7ccda1012696aabc01e478bd7612" category="cell">octubre de 2027</block>
   <block id="38999be4c01ec9d8c11d4405b7dc50e0" category="inline-link-macro">24,06</block>
   <block id="1e441e2a6ea2842643d9b8f88e32aebf" category="paragraph"><block ref="1e441e2a6ea2842643d9b8f88e32aebf" category="inline-link-macro-rx"></block></block>
-  <block id="94d267f658e04734eb2e098127293a89" category="cell">junio de 2025</block>
   <block id="4e9b156e7e2788c8cd4b0877fd922657" category="inline-link-macro">24,02</block>
   <block id="d2196853cebe173567df4b864e4816f7" category="paragraph"><block ref="d2196853cebe173567df4b864e4816f7" category="inline-link-macro-rx"></block></block>
-  <block id="6cc5c9e930ea3d3b8bff4367c60ceea4" category="cell">febrero de 2025</block>
   <block id="766995a062c6503acd7ac4752fbb865d" category="inline-link-macro">23,10</block>
   <block id="bcb8f00239af2cecd5a6b534dabea922" category="paragraph"><block ref="bcb8f00239af2cecd5a6b534dabea922" category="inline-link-macro-rx"></block></block>
   <block id="cfab1ba8c67c7c838db98d666f02a132" category="cell">--</block>
   <block id="217af7d1776d22530d98be04d104fd49" category="inline-link-macro">23,07</block>
   <block id="62bc04158f931e9b0a26f5676c8ab043" category="paragraph"><block ref="62bc04158f931e9b0a26f5676c8ab043" category="inline-link-macro-rx"></block></block>
-  <block id="928f12ce7e1197fe962e09f979b98d0d" category="cell">julio de 2025</block>
   <block id="a257f7f4b2f6e07845ce567df142ad00" category="cell">julio de 2026</block>
   <block id="1a3a2b5e6c52142797bb5c00594e2a3c" category="inline-link-macro">23,04</block>
   <block id="4f00a05b361ef580687832a6a48984db" category="paragraph"><block ref="4f00a05b361ef580687832a6a48984db" category="inline-link-macro-rx"></block></block>
-  <block id="42ce83dc3f5ef22d986311b267a5ac20" category="cell">abril de 2025</block>
   <block id="fc7d05f9009e90b92a15aad926bca249" category="cell">abril de 2026</block>
   <block id="8dfda84fc7f59655e20a770603bf9231" category="inline-link-macro">23,01</block>
   <block id="e0ed61e44672f0b6193055dd0719d240" category="paragraph"><block ref="e0ed61e44672f0b6193055dd0719d240" category="inline-link-macro-rx"></block></block>
   <block id="7022ed6df71cc12fbd0576cef4df23fd" category="cell">enero de 2026</block>
-  <block id="775d4bb28d257a6aa23992563a82c458" category="inline-link-macro">22,10</block>
-  <block id="1d064e71d708bc66779c604db1339850" category="paragraph"><block ref="1d064e71d708bc66779c604db1339850" category="inline-link-macro-rx"></block></block>
   <block id="40e41fb2db11266b8f751c0d5c67cba0" category="inline-link">Base de conocimientos de NetApp (se requiere iniciar sesión)</block>
   <block id="62c93f738b926db77daa59d585fbfa48" category="paragraph">Para obtener una lista completa de artículos de solución de problemas, consulte<block ref="57f5c759ada931c6a2051314ca6ee99e" category="inline-link-rx"></block> .</block>
   <block id="1cf7168782187634fbc408c66b895dbc" category="section-title">Apoyo comunitario</block>
@@ -1583,7 +1553,6 @@
   <block id="c4b35352cbf7a52a9444a610687067f8" category="doc">Desinstalar Trident</block>
   <block id="7fdff6d1496ee07f5530882ace839236" category="paragraph">Debes utilizar el mismo método para desinstalar Trident que el que utilizaste para Trident.</block>
   <block id="bbe48fb854ea022537208eeeff822f91" category="list-title">Acerca de esta tarea</block>
-  <block id="e2f3eebc5fb0722c4ff76f470c4c3644" category="list-text">Si necesita solucionar errores detectados tras una actualización, problemas de dependencias o una actualización fallida o incompleta, debe desinstalar Trident y reinstalar la versión anterior siguiendo las instrucciones específicas para ello.<block ref="e168bf6cc8da3b05fae6b22bcd12ba37" category="inline-link-macro-rx"></block> .  Esta es la única forma recomendada de _revertir_ a una versión anterior.</block>
   <block id="0a5e338ee1a9820e7a4a7d64f09e4a90" category="inline-link-macro">Eliminar completamente Trident y CRD</block>
   <block id="bfc34bbf9ae6407400b3d77e0e84543b" category="list-text">Para facilitar la actualización y reinstalación, la desinstalación de Trident no elimina los CRD ni los objetos relacionados creados por Trident.  Si necesita eliminar completamente Trident y todos sus datos, consulte<block ref="a2addcf593ef6071e49d2a678662f830" category="inline-link-macro-rx"></block> .</block>
   <block id="39596b8f60148eb1bbb5294ed08b18e3" category="paragraph">Si va a desmantelar clústeres de Kubernetes, debe eliminar todas las aplicaciones que utilizan volúmenes creados por Trident antes de la desinstalación.  Esto garantiza que los PVC se despubliquen en los nodos de Kubernetes antes de ser eliminados.</block>
@@ -1634,8 +1603,6 @@
   <block id="5430a6b8f98712c8210f8df2d906793a" category="paragraph">Puedes actualizar Trident usando el operador Trident, ya sea manualmente o usando Helm.  Puede actualizar de una instalación de operador Trident a otra instalación de operador Trident o actualizar desde una<block ref="c67fd1b99934afa248dfeb285a9a4191" prefix=" " category="inline-code"></block> Instalación en una versión de operador Trident .  Revisar<block ref="5cffa5fbe758cc3901f0e33c78b29d1b" category="inline-link-macro-rx"></block> antes de actualizar una instalación de operador Trident .</block>
   <block id="3ef75911ec16a9d0ba70cfd4e68dcb71" category="section-title">Actualizar una instalación manual</block>
   <block id="618fab30e005e12b783d70218c18af46" category="paragraph">Puede actualizar desde una instalación de operador Trident con ámbito de clúster a otra instalación de operador Trident con ámbito de clúster. Todas las versiones de Trident utilizan un operador con ámbito de clúster.</block>
-  <block id="b0e74afe1fdeb605b5c47b501c43b71b" category="inline-link-macro">tu versión instalada</block>
-  <block id="18466b7fafaca62c9c0d2438889ca0c6" category="admonition">Para actualizar desde Trident instalado mediante el operador con ámbito de espacio de nombres (versiones 20.07 a 20.10), siga las instrucciones de actualización para<block ref="567dd1ff029f25a404a69ff1e3c8d83b" category="inline-link-macro-rx"></block> del Trident.</block>
   <block id="eb7a4fa3d9aff7ec5b23abb8b82d516b" category="paragraph">Trident proporciona un archivo de paquete que puede utilizar para instalar el operador y crear objetos asociados para su versión de Kubernetes.</block>
   <block id="bd2cc8575fe69c7f775292759380c838" category="inline-link-macro">bundle_pre_1_25.yaml</block>
   <block id="f27e6cf95381139bd9916c64f178d212" category="list-text">Para clústeres que ejecutan Kubernetes 1.24, utilice<block ref="ccef28639b5a7d8b851d32c1ca719ce3" category="inline-link-macro-rx"></block> .</block>
@@ -1686,8 +1653,6 @@
   <block id="87459c33b1692755deb4b22c7eaa864c" category="section-title">Paso 1: Seleccione una versión</block>
   <block id="a307a5edde0e4eeeb35bb77f0a1f1cc7" category="paragraph">Las versiones de Trident siguen una fecha.<block ref="fb6921a005d395f9482cdac0306d4935" prefix=" " category="inline-code"></block> Convención de nomenclatura, donde "YY" son los dos últimos dígitos del año y "MM" es el mes.  Los lanzamientos de Dot siguen a<block ref="d93ec759c4a0e8c1cf9c7653b2939656" prefix=" " category="inline-code"></block> convención, donde "X" es el nivel de parche.  Seleccionarás la versión a la que deseas actualizar en función de la versión desde la que estás actualizando.</block>
   <block id="843e8c92f2887fa83e4564f86e6a7ca0" category="list-text">Puede realizar una actualización directa a cualquier versión objetivo que se encuentre dentro de un rango de cuatro versiones con respecto a su versión instalada.  Por ejemplo, puede actualizar directamente desde la versión 24.06 (o cualquier versión derivada de la 24.06) a la versión 25.06.</block>
-  <block id="2251733916a92fc0c61d943165128928" category="inline-link-macro">versión anterior</block>
-  <block id="d4ea8129c0158e8c6ac0b3bb00a333e5" category="list-text">Si está actualizando desde una versión que no se encuentra dentro del período de cuatro versiones, realice una actualización en varios pasos.  Utilice las instrucciones de actualización para<block ref="a799aa6eaf3a5192b34ea19f24bb716f" category="inline-link-macro-rx"></block> Estás actualizando a la versión más reciente que se ajusta al período de cuatro versiones.  Por ejemplo, si está utilizando la versión 23.07 y desea actualizar a la versión 25.06:</block>
   <block id="96643a0b653f3484db440bd905d8e591" category="list-text">Primera actualización de la versión 23.07 a la 24.06.</block>
   <block id="0d5f6bd4062e1e564fa83bfc5eb6a64c" category="list-text">Luego, actualice de la versión 24.06 a la 25.06.</block>
   <block id="199ed8c975e8bb544d18428ba17adbc3" category="inline-link">Detalles del problema en GitHub</block>
@@ -3673,7 +3638,6 @@
   <block id="d3889fc650fa47326b5f1d0c56f50970" category="inline-link-macro">Estándares de seguridad de pods</block>
   <block id="5e65f8ef909da6c604c403e32b1b48ee" category="paragraph">Un nuevo<block ref="305368b4f0d008a807e095ab9da58448" category="inline-link-macro-rx"></block> Se ha añadido la sección (PSS) que detalla los permisos habilitados por Trident durante la instalación.</block>
   <block id="278dc4a29aa2b881b9dc4b45a82929c5" category="section-title">Cambios en 22.04</block>
-  <block id="1709d6f66b1414fcc9f298c36d33f86b" category="paragraph">NetApp mejora y optimiza continuamente sus productos y servicios. Estas son algunas de las últimas características de Trident.  Para versiones anteriores, consulte<block ref="25da125dffad1d6323c21354bccf0203" category="inline-link-rx"></block> .</block>
   <block id="7072ec708b0ea7e3243747d8b79c0d20" category="admonition">Si está actualizando desde cualquier versión anterior de Trident y utiliza Azure NetApp Files,<block ref="d5189de027922f81005951e6efe0efd5" prefix="" category="inline-code"></block> El parámetro de configuración ahora es un campo obligatorio y único.</block>
   <block id="cb60f101c87f3def78d0fef168389244" category="inline-link-macro">Problema de GitHub n.º 681</block>
   <block id="2901fba3b85d37ea6000d90e72366ba6" category="list-text">Mejora del análisis sintáctico de los nombres de iniciadores iSCSI.  (<block ref="3947f141b94c1867221790f45a6ee173" category="inline-link-macro-rx"></block> )</block>
@@ -5584,7 +5548,6 @@
   <block id="b9785b666a04771c63b539840201a4db" category="paragraph">Después de actualizar ONTAP, los clientes NFSv4.2 pueden informar errores de "argumento inválido" al intentar montar exportaciones NFSv4.2. Este problema ocurre cuando el<block ref="5a54626559918ca9ebb6414eebaa97bf" prefix=" " category="inline-code"></block> La opción no está habilitada en el SVM. .Solución alternativa Habilite la<block ref="5a54626559918ca9ebb6414eebaa97bf" prefix=" " category="inline-code"></block> opción en SVM o actualizar a ONTAP 9.12.1 o posterior, donde esta opción está habilitada de forma predeterminada.</block>
   <block id="65edeac74973a1ff99e0e74473ca1ac5" category="sidebar">Trident es un proveedor y orquestador de almacenamiento de código abierto mantenido por NetApp.  Te permite crear volúmenes de almacenamiento para aplicaciones en contenedores gestionadas por Docker y Kubernetes.</block>
   <block id="7d0ee6fed10d3d4e5c9ee496729ab519" category="sidebar">Notas de la versión</block>
-  <block id="93168a8084b3e838d2932c4734bd234e" category="sidebar">Versiones anteriores</block>
   <block id="312b0dc38b01ff32c1b2f5f81ee1ab2d" category="sidebar">Despliegue con el operador Trident</block>
   <block id="e0e3d7f1aacdf4a8196132549709430c" category="sidebar">Despliegue con tridentctl</block>
   <block id="386307d41b3f4169a1e6e046a727cdd2" category="sidebar">Actualizar con el operador Trident</block>
@@ -5862,4 +5825,9 @@
   <block id="3a175f8153aad5b64492df6eadb5a5af" category="paragraph">Los siguientes ejemplos muestran cómo importar volúmenes gestionados y no gestionados:</block>
   <block id="ae3918e109e702f2d03b5027de8a73eb" category="paragraph">El siguiente ejemplo importa un volumen en backend<block ref="c082d32d434314708cccf35dd974ac32" prefix=" " category="inline-code"></block> con el volumen<block ref="acdf8df0c694db089171ecaf51f80166" prefix=" " category="inline-code"></block>.</block>
   <block id="13ad5ea7a7de5c042f384062c89a068e" category="admonition">Si tu aplicación usa varios espacios de nombres y estos espacios de nombres tienen PVCs con el mismo nombre, las operaciones de restauración de instantáneas (tanto in situ como a un nuevo espacio de nombres) no funcionarán correctamente. Todos los volúmenes restaurados tendrán los mismos datos en vez de los datos correctos para cada espacio de nombres. Usa la restauración de copias de seguridad en vez de la restauración de instantáneas, o actualiza a la versión 26.02 o posterior que soluciona este problema.</block>
+  <block id="07a0c4f99cfe65cec75fbd8213b75633" category="paragraph"><block ref="07a0c4f99cfe65cec75fbd8213b75633" category="inline-link-macro-rx"></block></block>
+  <block id="0919404c158a119162b6d17412099e85" category="list-text">Si necesitas una solución para errores observados después de una actualización, problemas de dependencias o una actualización fallida o incompleta, deberías desinstalar Trident y reinstalar la versión anterior usando las instrucciones específicas para esa versión. Esta es la única forma recomendada de _downgrade_ a una versión anterior.</block>
+  <block id="6cb6457c77d43e645e6ad531fd87c3e7" category="admonition">Para actualizar desde Trident que fue instalado usando el operador con alcance de espacio de nombres (versiones 20.07 a 20.10), usa las instrucciones de actualización para tu versión instalada de Trident.</block>
+  <block id="c6e5aff4c5e70680da18857e52172127" category="list-text">Si estás actualizando desde una versión fuera de la ventana de cuatro versiones, realiza una actualización en varios pasos. Usa las instrucciones de actualización de la versión anterior desde la que estás actualizando para actualizar a la versión más reciente que se ajuste a la ventana de cuatro versiones. Por ejemplo, si estás ejecutando 23.07 y quieres actualizar a 25.06:</block>
+  <block id="bdb3932167e7866c6c505613dc0f7cb7" category="paragraph">NetApp está continuamente mejorando y perfeccionando sus productos y servicios. Estas son algunas de las últimas características de Trident. Para versiones anteriores, consulta las versiones anteriores de la documentación.</block>
 </blocks>

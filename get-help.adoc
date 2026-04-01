@@ -33,7 +33,7 @@ Autosuficiencia:: La documentación de Trident está disponible para los meses 2
 
 
  a| 
-link:https://docs.netapp.com/us-en/trident/index.html["25,06"^]
+link:https://docs.netapp.com/us-en/trident-2506/index.html["25,06"^]
 | junio de 2026 | junio de 2027 | junio de 2028 
 
 
@@ -44,42 +44,37 @@ link:https://docs.netapp.com/us-en/trident-2502/index.html["25,02"^]
 
  a| 
 link:https://docs.netapp.com/us-en/trident-2410/index.html["24,10"^]
-| octubre de 2025 | octubre de 2026 | octubre de 2027 
+| -- | octubre de 2026 | octubre de 2027 
 
 
  a| 
 link:https://docs.netapp.com/us-en/trident-2406/index.html["24,06"^]
-| junio de 2025 | junio de 2026 | junio de 2027 
+| -- | junio de 2026 | junio de 2027 
 
 
  a| 
 link:https://docs.netapp.com/us-en/trident-2402/index.html["24,02"^]
-| febrero de 2025 | febrero de 2026 | febrero de 2027 
+| -- | febrero de 2026 | febrero de 2027 
 
 
  a| 
 link:https://docs.netapp.com/us-en/trident-2310/index.html["23,10"^]
-| -- | octubre de 2025 | octubre de 2026 
+| -- | -- | octubre de 2026 
 
 
  a| 
 link:https://docs.netapp.com/us-en/trident-2307/index.html["23,07"^]
-| -- | julio de 2025 | julio de 2026 
+| -- | -- | julio de 2026 
 
 
  a| 
 link:https://docs.netapp.com/us-en/trident-2304/index.html["23,04"^]
-| -- | abril de 2025 | abril de 2026 
+| -- | -- | abril de 2026 
 
 
  a| 
 link:https://docs.netapp.com/us-en/trident-2301/index.html["23,01"^]
 | -- | -- | enero de 2026 
-
-
- a| 
-link:https://docs.netapp.com/us-en/trident-2210/index.html["22,10"^]
-| -- | -- | octubre de 2025 
 |===
 
 
