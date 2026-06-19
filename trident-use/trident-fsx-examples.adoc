@@ -154,7 +154,7 @@ Puedes controlar el aprovisionamiento predeterminado utilizando estas opciones e
 | `encryption` | Habilite el cifrado de volumen de NetApp (NVE) en el nuevo volumen; el valor predeterminado es `false` .  Para utilizar esta opción, NVE debe estar licenciado y habilitado en el clúster.  Si NAE está habilitado en el backend, cualquier volumen aprovisionado en Trident tendrá NAE habilitado.  Para obtener más información, consulte:link:../trident-reco/security-reco.html["Cómo funciona Trident con NVE y NAE"] . | `false` 
 
 
-| `luksEncryption` | Habilitar el cifrado LUKS. Referirse alink:../trident-reco/security-reco.html#Use-Linux-Unified-Key-Setup-(LUKS)["Utilice la configuración de clave unificada de Linux (LUKS)."] .  Solo SAN. | "" 
+| `luksEncryption` | Habilita el cifrado LUKS. Consulta link:../trident-reco/security-luks.html["Utilice la configuración de clave unificada de Linux (LUKS)."]. Solo SAN. | "" 
 
 
 | `tieringPolicy` | Política de niveles a utilizar	`none` |  

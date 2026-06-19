@@ -12,7 +12,7 @@ summary: Puedes utilizar el punto de conexión REST directamente si prefieres in
 
 
 [role="lead"]
-Mientraslink:tridentctl.html["Comandos y opciones de tridentctl"] son la forma más sencilla de interactuar con la API REST de Trident ; si lo prefiere, puede utilizar el punto de conexión REST directamente.
+Si bien link:../trident-managing-k8s/tridentctl.html["Comandos y opciones de tridentctl"] son la forma más sencilla de interactuar con la API de REST de Trident, puedes usar el endpoint REST directamente si lo prefieres.
 
 
 

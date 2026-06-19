@@ -141,7 +141,7 @@ Puedes eliminar un volumen que se comparte entre varios espacios de nombres.  Tr
 
 == Usar `tridentctl get` para consultar volúmenes subordinados
 
-Utilizando el[`tridentctl` utilidad, puedes ejecutar la `get` comando para obtener volúmenes subordinados.  Para obtener más información, consulte el siguiente enlace: ../trident-reference/tridentctl.html[`tridentctl` comandos y opciones].
+Usando la utilidad [`tridentctl`, puedes ejecutar el comando  `get` para obtener los volúmenes subordinados. Para más información, consulta link:../trident-managing-k8s/tridentctl.html[`tridentctl` comandos y opciones].
 
 [listing]
 ----
@@ -170,6 +170,5 @@ Banderas:
 
 Para obtener más información sobre el acceso a volúmenes entre espacios de nombres:
 
-* Visitalink:https://cloud.netapp.com/blog/astra-blg-sharing-volumes-between-namespaces-say-hello-to-cross-namespace-volume-access["Compartir volúmenes entre espacios de nombres: Descubra el acceso a volúmenes entre espacios de nombres."^] .
 * Vea la demostración enlink:https://media.netapp.com/page/9071d19d-1438-5ed3-a7aa-ea4d73c28b7f/solutions-products["NetAppTV"^] .
 
