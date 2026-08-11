@@ -16,6 +16,7 @@ Trident expone varias opciones de línea de comandos para el orquestador Trident
 
 
 
+[[logging]]
 == Explotación florestal
 
 `-debug`:: Habilita la salida de depuración.
@@ -24,6 +25,7 @@ Trident expone varias opciones de línea de comandos para el orquestador Trident
 
 
 
+[[kubernetes]]
 == Kubernetes
 
 `-k8s_pod`:: Utilice esta opción o `-k8s_api_server` para habilitar la compatibilidad con Kubernetes.  Al configurar esto, Trident utilizará las credenciales de la cuenta de servicio de Kubernetes del pod que lo contiene para contactar con el servidor de la API.  Esto solo funciona cuando Trident se ejecuta como un pod en un clúster de Kubernetes con cuentas de servicio habilitadas.
@@ -32,6 +34,7 @@ Trident expone varias opciones de línea de comandos para el orquestador Trident
 
 
 
+[[docker]]
 == Docker
 
 `-volume_driver <name>`:: Nombre del controlador utilizado al registrar el complemento de Docker.  Valor predeterminado `netapp` .
@@ -41,6 +44,7 @@ Trident expone varias opciones de línea de comandos para el orquestador Trident
 
 
 
+[[rest]]
 == DESCANSAR
 
 `-address <ip-or-host>`:: Especifica la dirección en la que debe escuchar el servidor REST de Trident.  Por defecto, se utiliza localhost.  Al escuchar en localhost y ejecutarse dentro de un pod de Kubernetes, la interfaz REST no es directamente accesible desde fuera del pod.  Usar `-address ""` para que la interfaz REST sea accesible desde la dirección IP del pod.

@@ -16,6 +16,7 @@ Puede ver las clases de almacenamiento existentes, establecer una clase de almac
 
 
 
+[[view-the-existing-storage-classes]]
 == Vea las clases de almacenamiento existentes
 
 * Para ver las clases de almacenamiento de Kubernetes existentes, ejecute el siguiente comando:
@@ -48,6 +49,7 @@ tridentctl get storageclass <storage-class> -o json
 ----
 
 
+[[set-a-default-storage-class]]
 == Establecer una clase de almacenamiento predeterminada
 
 Kubernetes 1.6 añadió la capacidad de establecer una clase de almacenamiento predeterminada.  Esta es la clase de almacenamiento que se utilizará para aprovisionar un volumen persistente si un usuario no especifica uno en una reclamación de volumen persistente (PVC).
@@ -74,6 +76,7 @@ NOTE: Solo debe haber una clase de almacenamiento predeterminada en su clúster 
 
 
 
+[[identify-the-backend-for-a-storage-class]]
 == Identificar el backend para una clase de almacenamiento
 
 Este es un ejemplo del tipo de preguntas que puedes responder con el JSON que `tridentctl` Salidas para objetos backend de Trident .  Esto utiliza el `jq` utilidad, que tal vez necesites instalar primero.
@@ -84,6 +87,7 @@ tridentctl get storageclass -o json | jq  '[.items[] | {storageClass: .Config.na
 ----
 
 
+[[delete-a-storage-class]]
 == Eliminar una clase de almacenamiento
 
 Para eliminar una clase de almacenamiento de Kubernetes, ejecute el siguiente comando:

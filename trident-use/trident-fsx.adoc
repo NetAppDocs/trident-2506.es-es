@@ -22,6 +22,7 @@ Al usar Trident con Amazon FSx for NetApp ONTAP, puede garantizar que los clúst
 
 
 
+[[requirements]]
 == Requisitos
 
 Además delink:../trident-get-started/requirements.html["Requisitos de Trident"] Para integrar FSx para ONTAP con Trident, necesitas:
@@ -37,6 +38,7 @@ NOTE: Asegúrese de seguir los pasos de preparación de nodos necesarios para Am
 
 
 
+[[considerations]]
 == Consideraciones
 
 * Volúmenes SMB:
@@ -55,6 +57,7 @@ NOTE: Si especificas un rol de IAM para Trident, puedes omitir la especificació
 
 
 
+[[simultaneous-usage-of-trident-saniscsi-and-ebs-csi-driver]]
 === Uso simultáneo del controlador Trident SAN/iSCSI y EBS-CSI
 
 Si planea usar controladores ontap-san (por ejemplo, iSCSI) con AWS (EKS, ROSA, EC2 o cualquier otra instancia), la configuración de múltiples rutas requerida en los nodos podría entrar en conflicto con el controlador CSI de Amazon Elastic Block Store (EBS). Para garantizar que las funciones de rutas múltiples funcionen sin interferir con los discos EBS en el mismo nodo, debe excluir EBS en su configuración de rutas múltiples. Este ejemplo muestra un `multipath.conf` Archivo que incluye la configuración necesaria de Trident excluyendo los discos EBS del multipathing:
@@ -73,6 +76,7 @@ blacklist {
 ----
 
 
+[[authentication]]
 == Autenticación
 
 Trident ofrece dos modos de autenticación.
@@ -93,6 +97,7 @@ Para obtener detalles sobre cómo habilitar la autenticación, consulte la auten
 
 
 
+[[tested-amazon-machine-images-amis]]
 == Imágenes de máquina de Amazon (AMI) probadas
 
 El clúster EKS admite varios sistemas operativos, pero AWS ha optimizado ciertas imágenes de máquina de Amazon (AMI) para contenedores y EKS.  Las siguientes AMI se han probado con NetApp Trident 25.02.
@@ -143,6 +148,7 @@ NOTE: Si la AMI que desea no aparece en esta lista, no significa que no sea comp
 
 
 
+[[find-more-information]]
 == Encuentra más información
 
 * https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/what-is-fsx-ontap.html["Documentación de Amazon FSx for NetApp ONTAP"^]

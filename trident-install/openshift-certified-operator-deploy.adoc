@@ -19,6 +19,7 @@ Antes de comenzar la instalación,link:../trident-get-started/requirements.html[
 
 
 
+[[uninstall-the-netapp-trident-community-operator]]
 == Desinstale el operador de la comunidad NetApp Trident
 
 .Pasos
@@ -39,6 +40,7 @@ WARNING: No seleccione *Eliminar todas las instancias de operando de este operad
 
 
 
+[[install-the-openshift-certified-operator]]
 == Instale el operador certificado de OpenShift.
 
 .Pasos
@@ -52,6 +54,7 @@ image::../media/openshift-operator-05.png[Instalar]
 
 
 
+[[verification]]
 == Verificación
 
 * Compruebe el OperatorHub en la consola para asegurarse de que el nuevo operador certificado se ha instalado correctamente.

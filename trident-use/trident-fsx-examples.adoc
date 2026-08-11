@@ -16,6 +16,7 @@ Obtenga información sobre las opciones de configuración de backend para Amazon
 
 
 
+[[backend-configuration-options]]
 == Opciones de configuración del backend
 
 Consulte la siguiente tabla para ver las opciones de configuración del backend:
@@ -108,6 +109,7 @@ Consulte la siguiente tabla para ver las opciones de configuración del backend:
 |===
 
 
+[[update-datalif-after-initial-configuration]]
 === Actualizar `dataLIF` después de la configuración inicial
 
 Puede cambiar el dataLIF después de la configuración inicial ejecutando el siguiente comando para proporcionar el nuevo archivo JSON de backend con el dataLIF actualizado.
@@ -121,6 +123,7 @@ NOTE: Si los PVC están conectados a uno o varios pods, debe desconectar todos l
 
 
 
+[[backend-configuration-options-for-provisioning-volumes]]
 == Opciones de configuración de backend para el aprovisionamiento de volúmenes
 
 Puedes controlar el aprovisionamiento predeterminado utilizando estas opciones en el `defaults` sección de la configuración.  Para ver un ejemplo, consulte los ejemplos de configuración a continuación.
@@ -167,6 +170,7 @@ Puedes controlar el aprovisionamiento predeterminado utilizando estas opciones e
 |===
 
 
+[[example-configurations]]
 == Configuraciones de ejemplo
 
 .Configuración de la clase de almacenamiento para volúmenes SMB

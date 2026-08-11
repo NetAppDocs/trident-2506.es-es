@@ -16,6 +16,7 @@ Puedes recopilar registros para obtener ayuda en la resolución de problemas.  E
 
 
 
+[[collect-logs-for-troubleshooting]]
 == Recopilar registros para la resolución de problemas
 
 .Pasos
@@ -64,6 +65,7 @@ docker plugin enable <plugin>
 
 
 
+[[general-troubleshooting-tips]]
 == Consejos generales para la solución de problemas
 
 * El problema más común con el que se encuentran los nuevos usuarios es una configuración incorrecta que impide que el plugin se inicialice.  Cuando esto ocurra, probablemente verá un mensaje como este al intentar instalar o habilitar el complemento:

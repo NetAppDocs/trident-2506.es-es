@@ -16,6 +16,7 @@ Obtenga información sobre las opciones de configuración de backend NFS y SMB p
 
 
 
+[[backend-configuration-options]]
 == Opciones de configuración del backend
 
 Trident utiliza su configuración de backend (subred, red virtual, nivel de servicio y ubicación) para crear volúmenes de Azure NetApp Files en grupos de capacidad que estén disponibles en la ubicación solicitada y que coincidan con el nivel de servicio y la subred solicitados.
@@ -100,6 +101,7 @@ NOTE: Para obtener más información sobre las funciones de red, consultelink:ht
 
 
 
+[[required-permissions-and-resources]]
 === Permisos y recursos necesarios
 
 Si recibe un error de "No se encontraron grupos de capacidad" al crear un PVC, es probable que el registro de su aplicación no tenga asociados los permisos y recursos necesarios (subred, red virtual, grupo de capacidad).  Si la depuración está habilitada, Trident registrará los recursos de Azure detectados cuando se cree el backend.  Verifique que se esté utilizando el rol adecuado.
@@ -129,6 +131,7 @@ El `resourceGroups` , `netappAccounts` , y `capacityPools` Los valores son filtr
 |===
 
 
+[[volume-provisioning]]
 === Aprovisionamiento de volumen
 
 Puede controlar el aprovisionamiento de volúmenes predeterminado especificando las siguientes opciones en una sección especial del archivo de configuración. Referirse a <<Configuraciones de ejemplo>> Para más detalles.
@@ -152,6 +155,7 @@ Puede controlar el aprovisionamiento de volúmenes predeterminado especificando 
 |===
 
 
+[[example-configurations]]
 == Configuraciones de ejemplo
 
 Los siguientes ejemplos muestran configuraciones básicas que dejan la mayoría de los parámetros con sus valores predeterminados.  Esta es la forma más sencilla de definir un backend.
@@ -393,12 +397,14 @@ supportedTopologies:
 ====
 
 
+[[storage-class-definitions]]
 == Definiciones de clases de almacenamiento
 
 La siguiente `StorageClass` Las definiciones se refieren a los grupos de almacenamiento mencionados anteriormente.
 
 
 
+[[example-definitions-using-parameter-selector-field]]
 === Definiciones de ejemplo que utilizan `parameter.selector` campo
 
 Usando `parameter.selector` Puedes especificarlo para cada uno. `StorageClass` el grupo virtual que se utiliza para alojar un volumen.  El volumen tendrá los aspectos definidos en el pool elegido.
@@ -437,6 +443,7 @@ allowVolumeExpansion: true
 ----
 
 
+[[example-definitions-for-smb-volumes]]
 === Definiciones de ejemplo para volúmenes SMB
 
 Usando `nasType` , `node-stage-secret-name` , y `node-stage-secret-namespace` , puede especificar un volumen SMB y proporcionar las credenciales de Active Directory necesarias.
@@ -497,6 +504,7 @@ NOTE: `nasType: smb`Filtros para pools que admiten volúmenes SMB. `nasType: nfs
 
 
 
+[[create-the-backend]]
 == Crea el backend
 
 Después de crear el archivo de configuración del backend, ejecute el siguiente comando:

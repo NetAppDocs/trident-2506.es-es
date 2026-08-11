@@ -16,6 +16,7 @@ Cada plataforma de almacenamiento del portafolio de NetApp tiene capacidades ún
 
 
 
+[[platform-overview]]
 == Descripción general de la plataforma
 
 Trident funciona con ONTAP y Element.  No existe una plataforma que se adapte mejor a todas las aplicaciones y escenarios que otra; sin embargo, al elegir una plataforma se deben tener en cuenta las necesidades de la aplicación y del equipo que administra el dispositivo.
@@ -24,6 +25,7 @@ Debes seguir las mejores prácticas básicas para el sistema operativo anfitrió
 
 
 
+[[ontap-and-cloud-volumes-ontap-best-practices]]
 == Mejores prácticas de ONTAP y Cloud Volumes ONTAP
 
 Aprenda las mejores prácticas para configurar ONTAP y Cloud Volumes ONTAP para Trident.
@@ -32,6 +34,7 @@ Las siguientes recomendaciones son pautas para configurar ONTAP para cargas de t
 
 
 
+[[use-svms-dedicated-to-trident]]
 === Utilice SVM dedicados a Trident.
 
 Las máquinas virtuales de almacenamiento (SVM) proporcionan aislamiento y separación administrativa entre inquilinos en un sistema ONTAP . Dedicar una SVM a las aplicaciones permite la delegación de privilegios y la aplicación de las mejores prácticas para limitar el consumo de recursos.
@@ -49,6 +52,7 @@ No hay preferencia entre tener una LIF de administración dedicada o compartida 
 
 
 
+[[limit-the-maximum-volume-count]]
 === Limitar el recuento de volumen máximo
 
 Los sistemas de almacenamiento ONTAP tienen un número máximo de volúmenes, que varía según la versión del software y la plataforma de hardware.  Referirse a https://hwu.netapp.com/["NetApp Hardware Universe"^] para su plataforma específica y versión de ONTAP para determinar los límites exactos.  Cuando se agota el número de volúmenes, las operaciones de aprovisionamiento fallan no solo para Trident, sino para todas las solicitudes de almacenamiento.
@@ -72,6 +76,7 @@ Por ejemplo, un clúster ONTAP de dos nodos tiene la capacidad de alojar un máx
 
 
 
+[[clone-a-volume]]
 === Clonar un volumen
 
 NetApp Trident admite la clonación de volúmenes al usar `ontap-nas` , `ontap-san` , `solidfire-san` , y `gcp-cvs` Controladores de almacenamiento.  Al usar el `ontap-nas-flexgroup` o `ontap-nas-economy` controladores, la clonación no es compatible.  La creación de un nuevo volumen a partir de un volumen existente dará como resultado la creación de una nueva instantánea.
@@ -81,6 +86,7 @@ WARNING: Evite clonar un PVC que esté asociado con una StorageClass diferente. 
 
 
 
+[[limit-the-maximum-size-of-volumes-created-by-trident]]
 === Limitar el tamaño máximo de los volúmenes creados por Trident
 
 Para configurar el tamaño máximo de los volúmenes que puede crear Trident, utilice el `limitVolumeSize` parámetro en su `backend.json` definición.
@@ -89,18 +95,21 @@ Además de controlar el tamaño del volumen en la matriz de almacenamiento, tamb
 
 
 
+[[limit-the-maximum-size-of-flexvols-created-by-trident]]
 === Limitar el tamaño máximo de los FlexVols creados por Trident
 
 Para configurar el tamaño máximo de los FlexVols utilizados como pools para los controladores ontap-san-economy y ontap-nas-economy, utilice el siguiente comando: `limitVolumePoolSize` parámetro en su `backend.json` definición.
 
 
 
+[[configure-trident-to-use-bidirectional-chap]]
 === Configure Trident para usar CHAP bidireccional.
 
 Puedes especificar el iniciador CHAP y los nombres de usuario y contraseñas de destino en la definición de tu backend y hacer que Trident habilite CHAP en la SVM.  Utilizando el `useCHAP` En la configuración de su backend, Trident autentica las conexiones iSCSI para backends ONTAP con CHAP.
 
 
 
+[[create-and-use-an-svm-qos-policy]]
 === Cree y utilice una política de QoS para SVM.
 
 Al aprovechar una política QoS de ONTAP , aplicada a la SVM, se limita el número de IOPS que pueden consumir los volúmenes aprovisionados de Trident .  Esto ayuda a http://docs.netapp.com/ontap-9/topic/com.netapp.doc.pow-perf-mon/GUID-77DF9BAF-4ED7-43F6-AECE-95DFB0680D2F.html?cp=7_1_2_1_2["prevenir el acoso"^] o un contenedor fuera de control que afecte a cargas de trabajo externas a la SVM de Trident .
@@ -131,6 +140,7 @@ IMPORTANT: Debe asignar el grupo de políticas QoS al SVM *únicamente* si su ve
 
 
 
+[[create-qos-policy-groups-for-trident]]
 === Cree grupos de políticas de QoS para Trident.
 
 La calidad de servicio (QoS) garantiza que el rendimiento de las cargas de trabajo críticas no se vea degradado por cargas de trabajo competidoras.  Los grupos de políticas QoS de ONTAP proporcionan opciones de QoS para volúmenes y permiten a los usuarios definir el límite máximo de rendimiento para una o más cargas de trabajo.  Para obtener más información sobre QoS, consulte https://docs.netapp.com/ontap-9/topic/com.netapp.doc.pow-perf-mon/GUID-77DF9BAF-4ED7-43F6-AECE-95DFB0680D2F.html["Garantizar el rendimiento con QoS"^] .  Puede especificar grupos de políticas QoS en el backend o en un grupo de almacenamiento, y estos se aplicarán a cada volumen creado en ese grupo o backend.
@@ -172,6 +182,7 @@ Para obtener más información sobre los grupos de políticas de QoS, consulte h
 
 
 
+[[limit-storage-resource-access-to-kubernetes-cluster-members]]
 === Limitar el acceso a los recursos de almacenamiento a los miembros del clúster de Kubernetes
 
 Limitar el acceso a los volúmenes NFS, LUN iSCSI y LUN FC creados por Trident es un componente crítico de la postura de seguridad para su implementación de Kubernetes. Al hacerlo, se evita que los hosts que no forman parte del clúster de Kubernetes accedan a los volúmenes y potencialmente modifiquen los datos de forma inesperada.
@@ -188,6 +199,7 @@ Para implementaciones que tienen nodos de infraestructura dedicados (por ejemplo
 
 
 
+[[use-a-dedicated-export-policy]]
 === Utilice una política de exportación específica
 
 Debe asegurarse de que exista una política de exportación para cada backend que solo permita el acceso a los nodos presentes en el clúster de Kubernetes. Trident puede crear y gestionar automáticamente políticas de exportación. De esta manera, Trident limita el acceso a los volúmenes que aprovisiona a los nodos del clúster de Kubernetes y simplifica la adición o eliminación de nodos.
@@ -202,6 +214,7 @@ Al ejecutar estos comandos, podrá restringir qué nodos de Kubernetes tienen ac
 
 
 
+[[disable-showmount-for-the-application-svm]]
 === Desactivar `showmount` para la aplicación SVM
 
 El `showmount` Esta función permite que un cliente NFS consulte al SVM para obtener una lista de las exportaciones NFS disponibles.  Un pod desplegado en el clúster de Kubernetes puede emitir el `showmount -e` Ejecuta el comando contra el servidor y recibe una lista de los puntos de montaje disponibles, incluidos aquellos a los que no tiene acceso.  Si bien esto, por sí solo, no constituye una vulneración de la seguridad, sí proporciona información innecesaria que podría ayudar a un usuario no autorizado a conectarse a una exportación NFS.
@@ -214,18 +227,21 @@ vserver nfs modify -vserver <svm_name> -showmount disabled
 ----
 
 
+[[solidfire-best-practices]]
 == Mejores prácticas de SolidFire
 
 Aprenda las mejores prácticas para configurar el almacenamiento SolidFire para Trident.
 
 
 
+[[create-solidfire-account]]
 === Crear cuenta de Solidfire
 
 Cada cuenta de SolidFire representa un propietario de volumen único y recibe su propio conjunto de credenciales del Protocolo de Autenticación por Desafío-Respuesta (CHAP).  Puede acceder a los volúmenes asignados a una cuenta utilizando el nombre de la cuenta y las credenciales CHAP correspondientes o a través de un grupo de acceso a volúmenes.  Una cuenta puede tener asignados hasta dos mil volúmenes, pero un volumen solo puede pertenecer a una cuenta.
 
 
 
+[[create-a-qos-policy]]
 === Crea una política de QoS
 
 Utilice las políticas de Calidad de Servicio (QoS) de SolidFire si desea crear y guardar una configuración de calidad de servicio estandarizada que se pueda aplicar a muchos volúmenes.
@@ -278,6 +294,7 @@ El tamaño de bloque y el ancho de banda influyen directamente en el número de 
 
 
 
+[[solidfire-authentication]]
 === Autenticación de SolidFire
 
 Element admite dos métodos de autenticación: CHAP y Grupos de Acceso por Volumen (VAG).  CHAP utiliza el protocolo CHAP para autenticar el host ante el servidor backend.  Los grupos de acceso a volúmenes controlan el acceso a los volúmenes que aprovisionan.  NetApp recomienda utilizar CHAP para la autenticación, ya que es más sencillo y no tiene límites de escalabilidad.
@@ -291,6 +308,7 @@ Sin embargo, si no se puede habilitar CHAP y se requieren VAG, cree el grupo de 
 
 
 
+[[where-to-find-more-information]]
 == ¿Dónde puedo encontrar más información?
 
 A continuación se enumeran algunos de los documentos sobre mejores prácticas.  Buscar en el https://www.netapp.com/search/["Biblioteca NetApp"^] para las versiones más recientes.

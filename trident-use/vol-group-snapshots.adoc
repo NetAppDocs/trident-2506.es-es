@@ -19,6 +19,7 @@ NOTE: VolumeGroupSnapshot es una función beta en Kubernetes con API beta.  Kube
 
 
 
+[[create-volume-group-snapshots]]
 == Crear instantáneas de grupos de volúmenes
 
 La instantánea de grupo de volúmenes es compatible con `ontap-san` Controlador, solo para el protocolo iSCSI, aún no compatible con Fibre Channel (FCP) ni NVMe/TCP.  Antes de comenzar
@@ -95,6 +96,7 @@ spec:
 ----
 
 
+[[recover-volume-data-using-a-group-snapshot]]
 == Recuperar datos de volumen mediante una instantánea de grupo
 
 Puede restaurar volúmenes persistentes individuales utilizando las instantáneas individuales que se han creado como parte de la instantánea del grupo de volúmenes.  No se puede recuperar la instantánea del grupo de volúmenes como una unidad.
@@ -110,6 +112,7 @@ NOTE: Al restaurar una copia de instantánea, se sobrescribe la configuración d
 
 
 
+[[in-place-volume-restoration-from-a-snapshot]]
 == Restauración de volumen in situ a partir de una instantánea
 
 Trident proporciona una restauración de volumen rápida e in situ a partir de una instantánea utilizando la `TridentActionSnapshotRestore` (TASR) CR.  Esta solicitud de cambio (CR) funciona como una acción imperativa de Kubernetes y no persiste una vez finalizada la operación.
@@ -118,6 +121,7 @@ Para obtener más información, consulte link:../trident-use/vol-snapshots.html#
 
 
 
+[[delete-a-pv-with-associated-group-snapshots]]
 == Eliminar un PV con instantáneas de grupo asociadas
 
 Al eliminar una instantánea de volumen de grupo:
@@ -129,6 +133,7 @@ Al eliminar una instantánea de volumen de grupo:
 
 
 
+[[deploy-a-volume-snapshot-controller]]
 == Implementar un controlador de instantáneas de volumen
 
 Si tu distribución de Kubernetes no incluye el controlador de instantáneas y los CRD, puedes implementarlos de la siguiente manera.
@@ -168,6 +173,7 @@ NOTE: Si es necesario, abra `deploy/kubernetes/snapshot-controller/rbac-snapshot
 
 
 
+[[related-links]]
 == Enlaces relacionados
 
 * link:../trident-reference/objects.html#kubernetes-volumegroupsnapshotclass-objects["Clase de instantánea de grupo de volumen"]

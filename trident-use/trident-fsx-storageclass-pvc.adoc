@@ -16,10 +16,12 @@ Configure un objeto StorageClass de Kubernetes y cree la clase de almacenamiento
 
 
 
+[[create-a-storage-class]]
 == Crear una clase de almacenamiento
 
 
 
+[[configure-a-kubernetes-storageclass-object]]
 === Configurar un objeto StorageClass de Kubernetes
 
 El https://kubernetes.io/docs/concepts/storage/storage-classes/["Objeto StorageClass de Kubernetes"^] El objeto identifica a Trident como el proveedor que se utiliza para esa clase e indica a Trident cómo aprovisionar un volumen. Utilice este ejemplo para configurar Storageclass para volúmenes que utilizan NFS (consulte la sección Atributos de Trident a continuación para obtener la lista completa de atributos):
@@ -72,6 +74,7 @@ Referirse alink:../trident-reference/objects.html["Objetos de Kubernetes y Tride
 
 
 
+[[create-a-storage-class]]
 === Crear una clase de almacenamiento
 
 .Pasos
@@ -97,6 +100,7 @@ basic-csi    csi.trident.netapp.io   15h
 ----
 
 
+[[create-the-pvc]]
 == Crea el PVC
 
 A https://kubernetes.io/docs/concepts/storage/persistent-volumes["_Reclamación de volumen persistente_"^] (PVC) es una solicitud de acceso al PersistentVolume en el clúster.
@@ -107,6 +111,7 @@ Una vez creado el PVC, puede montar el volumen en un soporte.
 
 
 
+[[sample-manifests]]
 === Ejemplos de manifiestos
 
 .Muestra de PersistentVolumeClaim
@@ -151,6 +156,7 @@ storageClassName: protection-gold
 ====
 
 
+[[create-pvc]]
 === Crear PVC
 
 .Pasos
@@ -177,6 +183,7 @@ Referirse alink:../trident-reference/objects.html["Objetos de Kubernetes y Tride
 
 
 
+[[trident-attributes]]
 == Atributos del Trident
 
 Estos parámetros determinan qué pools de almacenamiento gestionados por Trident deben utilizarse para aprovisionar volúmenes de un tipo determinado.

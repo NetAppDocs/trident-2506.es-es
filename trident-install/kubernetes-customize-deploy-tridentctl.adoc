@@ -16,6 +16,7 @@ Puedes utilizar el instalador de Trident para personalizar la instalación.
 
 
 
+[[learn-about-the-installer]]
 == Obtén más información sobre el instalador.
 
 El instalador de Trident le permite personalizar los atributos.  Por ejemplo, si ha copiado la imagen de Trident a un repositorio privado, puede especificar el nombre de la imagen mediante el uso de `--trident-image` .  Si ha copiado la imagen de Trident , así como las imágenes auxiliares de CSI necesarias, a un repositorio privado, podría ser preferible especificar la ubicación de dicho repositorio mediante el siguiente comando: `--image-registry` interruptor, que toma la forma `<registry FQDN>[:port]` .

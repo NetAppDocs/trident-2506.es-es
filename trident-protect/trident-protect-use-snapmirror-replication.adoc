@@ -18,6 +18,7 @@ Con Trident Protect, puede utilizar las capacidades de replicación asincrónica
 
 
 
+[[namespace-annotations-and-labels-during-restore-and-failover-operations]]
 == Anotaciones y etiquetas de espacio de nombres durante las operaciones de restauración y conmutación por error
 
 Durante las operaciones de restauración y conmutación por error, las etiquetas y anotaciones del espacio de nombres de destino se ajustan para que coincidan con las etiquetas y anotaciones del espacio de nombres de origen.  Las etiquetas o anotaciones del espacio de nombres de origen que no existen en el espacio de nombres de destino se agregan, y las etiquetas o anotaciones que ya existen se sobrescriben para que coincidan con el valor del espacio de nombres de origen.  Las etiquetas o anotaciones que existen únicamente en el espacio de nombres de destino permanecen sin cambios.
@@ -38,6 +39,7 @@ Si instalaste la aplicación de origen usando Helm con el `--create-namespace` b
 
 
 
+[[example]]
 === Ejemplo
 
 El siguiente ejemplo presenta un espacio de nombres de origen y destino, cada uno con diferentes anotaciones y etiquetas.  Puedes ver el estado del espacio de nombres de destino antes y después de la operación, y cómo se combinan o sobrescriben las anotaciones y etiquetas en el espacio de nombres de destino.
@@ -103,6 +105,7 @@ NOTE: Puede configurar Trident Protect para congelar y descongelar sistemas de a
 
 
 
+[[execution-hooks-during-failover-and-reverse-operations]]
 == Puntos de ejecución durante las operaciones de conmutación por error y reversa
 
 Al utilizar la relación AppMirror para proteger su aplicación, existen comportamientos específicos relacionados con los ganchos de ejecución que debe tener en cuenta durante las operaciones de conmutación por error y reversión.
@@ -115,6 +118,7 @@ Para obtener más información sobre los ganchos de ejecución, consultelink:../
 
 
 
+[[set-up-a-replication-relationship]]
 == Establecer una relación de replicación
 
 Establecer una relación de replicación implica lo siguiente:
@@ -446,6 +450,7 @@ kubectl get amr -n my-app-namespace <relationship name> -o=jsonpath='{.status}' 
 
 
 
+[[fail-over-to-destination-cluster]]
 === Conmutación por error al clúster de destino
 
 Con Trident Protect, puede conmutar por error las aplicaciones replicadas a un clúster de destino. Este procedimiento detiene la relación de replicación y pone la aplicación en línea en el clúster de destino. Trident Protect no detiene la aplicación en el clúster de origen si estaba operativa.
@@ -470,6 +475,7 @@ kubectl get amr -n my-app-namespace <relationship name> -o=jsonpath='{.status}' 
 
 
 
+[[resync-a-failed-over-replication-relationship]]
 === Resincronizar una relación de replicación fallida
 
 La operación de resincronización restablece la relación de replicación.  Después de realizar una operación de resincronización, la aplicación de origen original se convierte en la aplicación en ejecución y se descartan todos los cambios realizados en la aplicación en ejecución en el clúster de destino.
@@ -494,6 +500,7 @@ kubectl apply -f trident-protect-relationship.yaml -n my-app-namespace
 
 
 
+[[reverse-resync-a-failed-over-replication-relationship]]
 === Resincronización inversa de una relación de replicación fallida
 
 Cuando se resincroniza de forma inversa una relación de replicación por conmutación por error, la aplicación de destino se convierte en la aplicación de origen y el origen se convierte en el destino.  Los cambios realizados en la aplicación de destino durante la conmutación por error se conservan.
@@ -507,6 +514,7 @@ Cuando se resincroniza de forma inversa una relación de replicación por conmut
 
 
 
+[[reverse-application-replication-direction]]
 == Dirección de replicación de la aplicación inversa
 
 Cuando invierte la dirección de replicación, Trident Protect mueve la aplicación al backend de almacenamiento de destino mientras continúa replicando al backend de almacenamiento de origen original. Trident Protect detiene la aplicación de origen y replica los datos en el destino antes de conmutar por error a la aplicación de destino.
@@ -593,6 +601,7 @@ NOTE: En el paso 2 del procedimiento de conmutación por error, incluya el `spec
 
 
 
+[[result]]
 === Resultado
 
 Las siguientes acciones se producen debido a la replicación inversa:
@@ -607,6 +616,7 @@ Las siguientes acciones se producen debido a la replicación inversa:
 
 
 
+[[fail-back-applications-to-the-original-source-cluster]]
 === Revertir las aplicaciones al clúster de origen original
 
 Al utilizar Trident Protect, puede lograr una "conmutación por error" después de una operación de conmutación por error mediante la siguiente secuencia de operaciones. En este flujo de trabajo para restaurar la dirección de replicación original, Trident Protect replica (resincroniza) cualquier cambio de aplicación a la aplicación de origen original antes de revertir la dirección de replicación.
@@ -629,6 +639,7 @@ CAUTION: No realice una operación de resincronización normal, ya que esto desc
 
 
 
+[[delete-a-replication-relationship]]
 === Eliminar una relación de replicación
 
 Puedes eliminar una relación de replicación en cualquier momento.  Al eliminar la relación de replicación de la aplicación, se generan dos aplicaciones separadas sin ninguna relación entre ellas.

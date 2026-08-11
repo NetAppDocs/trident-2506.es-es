@@ -16,6 +16,7 @@ Puedes importar volúmenes de almacenamiento existentes como un PV de Kubernetes
 
 
 
+[[overview-and-considerations]]
 == Descripción general y consideraciones
 
 Podrías importar un volumen a Trident para:
@@ -52,6 +53,7 @@ TIP: Esta opción resulta útil si desea utilizar Kubernetes para cargas de trab
 
 
 
+[[import-a-volume]]
 == Importar un volumen
 
 Puedes importar un volumen usando `tridentctl import` o creando un PVC con anotaciones de importación de Trident.
@@ -147,12 +149,14 @@ Trident importará automáticamente el volumen y lo vinculará al PVC.
 ====
 
 
+[[examples]]
 == Ejemplos
 
 Revise los siguientes ejemplos de importación de volumen para los controladores compatibles.
 
 
 
+[[ontap-nas-and-ontap-nas-flexgroup]]
 === ONTAP NAS y ONTAP NAS FlexGroup
 
 Trident admite la importación de volúmenes mediante el `ontap-nas` y `ontap-nas-flexgroup` conductores.
@@ -260,6 +264,7 @@ spec:
 ====
 
 
+[[ontap-san]]
 === ONTAP SAN
 
 Trident admite la importación de volumen mediante el `ontap-san` (iSCSI, NVMe/TCP y FC) y `ontap-san-economy` Conductores.
@@ -312,6 +317,7 @@ image:./san-import-igroup.png["Imagen de LUNS mapeada a iqn y clúster iqn."]
 ====
 
 
+[[element]]
 === Elemento
 
 Trident admite el software NetApp Element y la importación de volúmenes NetApp HCI mediante `solidfire-san` conductor.
@@ -333,6 +339,7 @@ tridentctl import volume element_default element-managed -f pvc-basic-import.yam
 ----
 
 
+[[google-cloud-platform]]
 === Plataforma de Google Cloud
 
 Trident admite la importación de volúmenes mediante el `gcp-cvs` conductor.
@@ -355,6 +362,7 @@ tridentctl import volume gcpcvs_YEppr adroit-jolly-swift -f <path-to-pvc-file> -
 ----
 
 
+[[azure-netapp-files]]
 === Azure NetApp Files
 
 Trident admite la importación de volúmenes mediante el `azure-netapp-files` conductor.
@@ -376,6 +384,7 @@ tridentctl import volume azurenetappfiles_40517 importvol1 -f <path-to-pvc-file>
 ----
 
 
+[[google-cloud-netapp-volumes]]
 === Google Cloud NetApp Volumes
 
 Trident admite la importación de volúmenes mediante el `google-cloud-netapp-volumes` conductor.

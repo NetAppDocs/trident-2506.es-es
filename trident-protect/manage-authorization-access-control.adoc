@@ -35,12 +35,14 @@ Para obtener información sobre las cuentas de servicio, consulte la https://kub
 
 
 
+[[example-manage-access-for-two-groups-of-users]]
 == Ejemplo: Gestionar el acceso para dos grupos de usuarios
 
 Por ejemplo, una organización tiene un administrador de clúster, un grupo de usuarios de ingeniería y un grupo de usuarios de marketing.  El administrador del clúster completaría las siguientes tareas para crear un entorno donde el grupo de ingeniería y el grupo de marketing tengan acceso únicamente a los recursos asignados a sus respectivos espacios de nombres.
 
 
 
+[[step-1-create-a-namespace-to-contain-resources-for-each-group]]
 === Paso 1: Cree un espacio de nombres para contener los recursos de cada grupo.
 
 La creación de un espacio de nombres le permite separar lógicamente los recursos y controlar mejor quién tiene acceso a ellos.
@@ -62,6 +64,7 @@ kubectl create ns marketing-ns
 
 
 
+[[step-2-create-new-service-accounts-to-interact-with-resources-in-each-namespace]]
 === Paso 2: Cree nuevas cuentas de servicio para interactuar con los recursos en cada espacio de nombres.
 
 Cada nuevo espacio de nombres que cree viene con una cuenta de servicio predeterminada, pero debería crear una cuenta de servicio para cada grupo de usuarios para que pueda dividir aún más los privilegios entre grupos en el futuro si fuera necesario.
@@ -91,6 +94,7 @@ metadata:
 
 
 
+[[step-3-create-a-secret-for-each-new-service-account]]
 === Paso 3: Cree un secreto para cada nueva cuenta de servicio
 
 Se utiliza una clave secreta de cuenta de servicio para autenticarse con la cuenta de servicio, y se puede eliminar y volver a crear fácilmente si se ve comprometida.
@@ -126,6 +130,7 @@ type: kubernetes.io/service-account-token
 
 
 
+[[step-4-create-a-rolebinding-object-to-bind-the-clusterrole-object-to-each-new-service-account]]
 === Paso 4: Cree un objeto RoleBinding para vincular el objeto ClusterRole a cada nueva cuenta de servicio.
 
 Se crea un objeto ClusterRole predeterminado cuando instala Trident Protect. Puede vincular este ClusterRole a la cuenta de servicio creando y aplicando un objeto RoleBinding.
@@ -171,6 +176,7 @@ subjects:
 
 
 
+[[step-5-test-permissions]]
 === Paso 5: Probar permisos
 
 Comprueba que los permisos sean correctos.
@@ -192,6 +198,7 @@ kubectl auth can-i --as=system:serviceaccount:engineering-ns:eng-user get applic
 
 
 
+[[step-6-grant-access-to-appvault-objects]]
 === Paso 6: Conceder acceso a los objetos de AppVault
 
 Para realizar tareas de administración de datos como copias de seguridad e instantáneas, el administrador del clúster debe otorgar acceso a los objetos de AppVault a usuarios individuales.

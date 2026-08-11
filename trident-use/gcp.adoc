@@ -16,6 +16,7 @@ Aprenda a configurar NetApp Cloud Volumes Service para Google Cloud como backend
 
 
 
+[[google-cloud-driver-details]]
 == Detalles del controlador de Google Cloud
 
 Trident proporciona el `gcp-cvs` controlador para comunicarse con el clúster.  Los modos de acceso compatibles son: _ReadWriteOnce_ (RWO), _ReadOnlyMany_ (ROX), _ReadWriteMany_ (RWX), _ReadWriteOncePod_ (RWOP).
@@ -37,6 +38,7 @@ RWO, ROX, RWX, RWOP
 |===
 
 
+[[learn-about-trident-support-for-cloud-volumes-service-for-google-cloud]]
 == Obtén más información sobre la compatibilidad de Trident con Cloud Volumes Service para Google Cloud.
 
 Trident puede crear volúmenes de Cloud Volumes Service en uno de dos link:https://docs.cloud.google.com/netapp/volumes/docs/discover/overview["tipos de servicio"^]:
@@ -67,6 +69,7 @@ Para configurar y usar el https://www.netapp.com/google-cloud/netapp-volumes/["C
 
 
 
+[[backend-configuration-options]]
 == Opciones de configuración del backend
 
 Cada backend aprovisiona volúmenes en una única región de Google Cloud.  Para crear volúmenes en otras regiones, puede definir backends adicionales.
@@ -129,6 +132,7 @@ Cada backend aprovisiona volúmenes en una única región de Google Cloud.  Para
 |===
 
 
+[[volume-provisioning-options]]
 == Opciones de aprovisionamiento de volumen
 
 Puedes controlar el aprovisionamiento de volúmenes predeterminado en el `defaults` sección del archivo de configuración.
@@ -151,6 +155,7 @@ Puedes controlar el aprovisionamiento de volúmenes predeterminado en el `defaul
 |===
 
 
+[[cvs-performance-service-type-examples]]
 == Ejemplos de tipos de servicio de CVS-Performance
 
 Los siguientes ejemplos proporcionan configuraciones de muestra para el tipo de servicio CVS-Performance.
@@ -287,6 +292,7 @@ storage:
 ====
 
 
+[[storage-class-definitions]]
 === Definiciones de clases de almacenamiento
 
 Las siguientes definiciones de StorageClass se aplican al ejemplo de configuración de grupo virtual.  Usando `parameters.selector` , puede especificar para cada StorageClass el grupo virtual utilizado para alojar un volumen.  El volumen tendrá los aspectos definidos en el pool elegido.
@@ -359,6 +365,7 @@ allowVolumeExpansion: true
 
 
 
+[[cvs-service-type-examples]]
 == Ejemplos de tipos de servicio de CVS
 
 Los siguientes ejemplos proporcionan configuraciones de muestra para el tipo de servicio CVS.
@@ -431,6 +438,7 @@ serviceLevel: Standardsw
 ====
 
 
+[[whats-next]]
 == ¿Que sigue?
 
 Después de crear el archivo de configuración del backend, ejecute el siguiente comando:

@@ -16,6 +16,7 @@ Aprenda sobre las opciones de configuración de backend para Google Cloud NetApp
 
 
 
+[[backend-configuration-options]]
 == Opciones de configuración del backend
 
 Cada backend aprovisiona volúmenes en una única región de Google Cloud.  Para crear volúmenes en otras regiones, puede definir backends adicionales.
@@ -74,6 +75,7 @@ Cada backend aprovisiona volúmenes en una única región de Google Cloud.  Para
 |===
 
 
+[[volume-provisioning-options]]
 == Opciones de aprovisionamiento de volumen
 
 Puedes controlar el aprovisionamiento de volúmenes predeterminado en el `defaults` sección del archivo de configuración.
@@ -96,6 +98,7 @@ Puedes controlar el aprovisionamiento de volúmenes predeterminado en el `defaul
 |===
 
 
+[[example-configurations]]
 == Configuraciones de ejemplo
 
 Los siguientes ejemplos muestran configuraciones básicas que dejan la mayoría de los parámetros con sus valores predeterminados.  Esta es la forma más sencilla de definir un backend.
@@ -339,6 +342,7 @@ supportedTopologies:
 ====
 
 
+[[whats-next]]
 == ¿Que sigue?
 
 Después de crear el archivo de configuración del backend, ejecute el siguiente comando:
@@ -366,6 +370,7 @@ Una vez que haya identificado y corregido el problema con el archivo de configur
 
 
 
+[[storage-class-definitions]]
 == Definiciones de clases de almacenamiento
 
 Lo siguiente es un esquema básico `StorageClass` Definición que hace referencia al backend mencionado anteriormente.
@@ -419,6 +424,7 @@ Para obtener más detalles sobre las clases de almacenamiento, consultelink:../t
 
 
 
+[[example-definitions-for-smb-volumes]]
 === Definiciones de ejemplo para volúmenes SMB
 
 Usando `nasType` , `node-stage-secret-name` , y `node-stage-secret-namespace` , puede especificar un volumen SMB y proporcionar las credenciales de Active Directory necesarias.  Se puede utilizar cualquier usuario/contraseña de Active Directory con cualquier permiso o sin permisos para el secreto de etapa del nodo.
@@ -479,6 +485,7 @@ NOTE: `nasType: smb`Filtros para pools que admiten volúmenes SMB. `nasType: nfs
 
 
 
+[[pvc-definition-example]]
 === Ejemplo de definición de PVC
 
 [source, yaml]

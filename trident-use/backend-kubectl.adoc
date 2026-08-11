@@ -16,6 +16,7 @@ Un backend define la relación entre Trident y un sistema de almacenamiento.  Le
 
 
 
+[[tridentbackendconfig]]
 == `TridentBackendConfig`
 
 `TridentBackendConfig` (`tbc`, `tbconfig` , `tbackendconfig` ) es un CRD frontend con espacios de nombres que le permite administrar backends de Trident usando `kubectl` .  Los administradores de Kubernetes y almacenamiento ahora pueden crear y administrar backends directamente a través de la CLI de Kubernetes sin necesidad de una utilidad de línea de comandos dedicada.(`tridentctl` ).
@@ -72,6 +73,7 @@ TIP: Backends que fueron creados con `tridentctl` no tienen un asociado `Trident
 
 
 
+[[steps-overview]]
 == Resumen de pasos
 
 Para crear un nuevo backend utilizando `kubectl` , debes hacer lo siguiente:
@@ -84,6 +86,7 @@ Después de crear un backend, puede observar su estado mediante el uso de `kubec
 
 
 
+[[step-1-create-a-kubernetes-secret]]
 == Paso 1: Crear un secreto de Kubernetes
 
 Crea un secreto que contenga las credenciales de acceso para el backend.  Esto es específico de cada servicio/plataforma de almacenamiento. He aquí un ejemplo:
@@ -190,6 +193,7 @@ El secreto creado en este paso se utilizará como referencia en el `spec.credent
 
 
 
+[[step-2-create-the-tridentbackendconfig-cr]]
 == Paso 2: Crear el `TridentBackendConfig` CR
 
 Ahora estás listo para crear tu `TridentBackendConfig` CR.  En este ejemplo, un backend que utiliza el `ontap-san` El controlador se crea utilizando el `TridentBackendConfig` objeto que se muestra a continuación:
@@ -216,6 +220,7 @@ spec:
 ----
 
 
+[[step-3-verify-the-status-of-the-tridentbackendconfig-cr]]
 == Paso 3: Verificar el estado del `TridentBackendConfig` CR
 
 Ahora que has creado el `TridentBackendConfig` CR, puede verificar el estado. Vea el siguiente ejemplo:
@@ -246,6 +251,7 @@ La fase puede tomar uno de los siguientes valores:
 
 
 
+[[optional-step-4-get-more-details]]
 == (Opcional) Paso 4: Obtenga más detalles
 
 Puedes ejecutar el siguiente comando para obtener más información sobre tu backend:

@@ -21,6 +21,7 @@ NOTE: Puede configurar Trident Protect para congelar y descongelar sistemas de a
 
 
 
+[[create-an-on-demand-snapshot]]
 == Crea una instantánea bajo demanda
 
 Puedes crear una instantánea bajo demanda en cualquier momento.
@@ -85,6 +86,7 @@ tridentctl-protect create snapshot <my_snapshot_name> --appvault <my_appvault_na
 ====
 
 
+[[create-an-on-demand-backup]]
 == Crea una copia de seguridad bajo demanda
 
 Puedes realizar una copia de seguridad de una aplicación en cualquier momento.
@@ -172,6 +174,7 @@ Opcionalmente, puede utilizar el `--full-backup` Bandera para especificar si una
 ====
 
 
+[[create-a-data-protection-schedule]]
 == Crea un calendario de protección de datos.
 
 Una política de protección protege una aplicación mediante la creación de instantáneas, copias de seguridad o ambas según un cronograma definido. Puede elegir crear instantáneas y copias de seguridad cada hora, día, semana o mes, y puede especificar la cantidad de copias que desea conservar. Puede programar una copia de seguridad completa no incremental mediante la anotación full-backup-rule. De forma predeterminada, todas las copias de seguridad son incrementales. Realizar una copia de seguridad completa periódicamente, junto con copias de seguridad incrementales entre ellas, ayuda a reducir el riesgo asociado con las restauraciones.
@@ -297,6 +300,7 @@ Para programaciones solo con instantáneas, configure `--backup-retention 0` y e
 ====
 
 
+[[delete-a-snapshot]]
 == Eliminar una instantánea
 
 Elimine las instantáneas programadas o bajo demanda que ya no necesite.
@@ -312,6 +316,7 @@ kubectl delete snapshot <snapshot_name> -n my-app-namespace
 
 
 
+[[delete-a-backup]]
 == Eliminar una copia de seguridad
 
 Elimine las copias de seguridad programadas o bajo demanda que ya no necesite.
@@ -330,6 +335,7 @@ kubectl delete backup <backup_name> -n my-app-namespace
 
 
 
+[[check-the-status-of-a-backup-operation]]
 == Comprobar el estado de una operación de copia de seguridad
 
 Puede utilizar la línea de comandos para comprobar el estado de una operación de copia de seguridad que esté en curso, haya finalizado o haya fallado.
@@ -345,6 +351,7 @@ kubectl get backup -n <namespace_name> <my_backup_cr_name> -o jsonpath='{.status
 
 
 
+[[enable-backup-and-restore-for-azure-netapp-files-anf-operations]]
 == Habilitar la copia de seguridad y la restauración para las operaciones de archivos de Azure NetApp (ANF).
 
 Si ha instalado Trident Protect, puede habilitar la funcionalidad de copia de seguridad y restauración que ahorra espacio para los backends de almacenamiento que usan la clase de almacenamiento azure-netapp-files y se crearon antes de Trident 24.06. Esta funcionalidad funciona con volúmenes NFSv4 y no consume espacio adicional del grupo de capacidad.

@@ -16,6 +16,7 @@ Con Trident, puedes asignar nombres y etiquetas descriptivos a los volúmenes qu
 
 
 
+[[before-you-begin]]
 == Antes de empezar
 
 Compatibilidad con nombres y etiquetas de volumen personalizables:
@@ -27,6 +28,7 @@ Compatibilidad con nombres y etiquetas de volumen personalizables:
 
 
 
+[[limitations]]
 == Limitaciones
 
 . Los nombres de volumen personalizables solo son compatibles con los controladores ONTAP locales.
@@ -35,6 +37,7 @@ Compatibilidad con nombres y etiquetas de volumen personalizables:
 
 
 
+[[key-behaviors-of-customizable-volume-names]]
 == Comportamientos clave de los nombres de volumen personalizables
 
 . Si se produce un fallo debido a una sintaxis no válida en una plantilla de nombre, falla la creación del backend.  Sin embargo, si falla la aplicación de la plantilla, el volumen se nombrará de acuerdo con la convención de nomenclatura existente.
@@ -43,6 +46,7 @@ Compatibilidad con nombres y etiquetas de volumen personalizables:
 
 
 
+[[backend-configuration-examples-with-name-template-and-labels]]
 == Ejemplos de configuración de backend con plantilla de nombre y etiquetas
 
 Se pueden definir plantillas de nombres personalizadas a nivel de raíz y/o de grupo.
@@ -103,6 +107,7 @@ Se pueden definir plantillas de nombres personalizadas a nivel de raíz y/o de g
 ----
 
 
+[[name-template-examples]]
 == Ejemplos de plantillas de nombres
 
 *Ejemplo 1*:
@@ -119,6 +124,7 @@ Se pueden definir plantillas de nombres personalizadas a nivel de raíz y/o de g
 ----
 
 
+[[points-to-consider]]
 == Puntos a considerar
 
 . En el caso de importaciones de volúmenes, las etiquetas se actualizan solo si el volumen existente tiene etiquetas en un formato específico.  Por ejemplo: `{"provisioning":{"Cluster":"ClusterA", "PVC": "pvcname"}}` .
